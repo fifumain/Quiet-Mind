@@ -1,6 +1,7 @@
 from datetime import timedelta
 from pathlib import Path
 
+from celery.schedules import crontab
 from dotenv import load_dotenv
 import os
 
@@ -29,6 +30,7 @@ INSTALLED_APPS = [
     "apps.core",
     "apps.accounts",
     "apps.quotes",
+    "apps.books",
     "apps.chat",
 ]
 
@@ -132,3 +134,13 @@ SIMPLE_JWT = {
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+CELERY_BROKER_URL = REDIS_URL
+CELERY_TIMEZONE = TIME_ZONE
+
+CELERY_BEAT_SCHEDULE = {
+    "pick-featured-book-weekly": {
+        "task": "apps.books.tasks.pick_featured_book",
+        "schedule": crontab(day_of_week="monday", hour=3, minute=0),
+    },
+}

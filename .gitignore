@@ -36,9 +36,14 @@ docker-compose.override.yml
 # Logs
 *.log
 
+# Celery
+celerybeat-schedule
+celerybeat.pid
+
 # Editors / OS
 .idea/
 .vscode/
 .DS_Store
 Thumbs.db
 apps/quotes/management/commands/seed_quotes.py
+apps/books/management/commands/seed_books.py

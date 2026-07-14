@@ -45,5 +45,24 @@ services:
       redis:
         condition: service_healthy
 
+  celery:
+    build:
+      context: .
+      args:
+        REQUIREMENTS_FILE: requirements/dev.txt
+    command: celery -A config worker -B --loglevel=info
+    env_file:
+      - .env
+    environment:
+      POSTGRES_HOST: postgres
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - .:/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 volumes:
   postgres_data:
