@@ -16,6 +16,7 @@ DEBUG = False
 ALLOWED_HOSTS = [h for h in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",") if h]
 
 INSTALLED_APPS = [
+    "unfold",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -134,6 +135,12 @@ SIMPLE_JWT = {
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+
+UNFOLD = {
+    "SITE_TITLE": "Psychology Companion Admin",
+    "SITE_HEADER": "Psychology Companion",
+    "SITE_URL": "/",
+}
 
 CELERY_BROKER_URL = REDIS_URL
 CELERY_TIMEZONE = TIME_ZONE
