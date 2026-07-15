@@ -117,11 +117,14 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend",
     ],
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
+    "DEFAULT_THROTTLE_RATES": {
+        "chat_message": "30/hour",
+    },
 }
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "AI-проводник по миру психологии",
-    "DESCRIPTION": "API для чат-собеседника на тему психологии со ссылками на книги, авторов и цитаты.",
+    "TITLE": "Psychology Companion API",
+    "DESCRIPTION": "API for an AI chat companion focused on psychology, with references to books, authors, and quotes.",
     "VERSION": "1.0.0",
     "SERVE_INCLUDE_SCHEMA": False,
 }
@@ -135,6 +138,15 @@ SIMPLE_JWT = {
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_TEMPERATURE = float(os.environ.get("GROQ_TEMPERATURE", "0.6"))
+GROQ_MAX_TOKENS = int(os.environ.get("GROQ_MAX_TOKENS", "300"))
+
+CHAT_CONTEXT_WINDOW_SIZE = 12
+CHAT_CONTEXT_CACHE_TTL_SECONDS = 60 * 60
+
+CHAT_TOOL_CACHE_TTL_SECONDS = 60 * 60 * 6
+
+LIST_CACHE_TTL_SECONDS = 60 * 15
 
 UNFOLD = {
     "SITE_TITLE": "Psychology Companion Admin",

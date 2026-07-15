@@ -2,24 +2,29 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.permissions import AllowAny
 
+from apps.core.cache import CachedListMixin
+
 from .filters import QuoteFilter
 from .models import Author, Category, Quote
 from .serializers import AuthorSerializer, CategorySerializer, QuoteSerializer
 
 
-class AuthorViewSet(viewsets.ReadOnlyModelViewSet):
+class AuthorViewSet(CachedListMixin, viewsets.ReadOnlyModelViewSet):
+    cache_model_name = "author"
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
     permission_classes = [AllowAny]
 
 
-class CategoryViewSet(viewsets.ReadOnlyModelViewSet):
+class CategoryViewSet(CachedListMixin, viewsets.ReadOnlyModelViewSet):
+    cache_model_name = "category"
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
     permission_classes = [AllowAny]
 
 
-class QuoteViewSet(viewsets.ReadOnlyModelViewSet):
+class QuoteViewSet(CachedListMixin, viewsets.ReadOnlyModelViewSet):
+    cache_model_name = "quote"
     queryset = Quote.objects.select_related("author").prefetch_related("categories")
     serializer_class = QuoteSerializer
     permission_classes = [AllowAny]

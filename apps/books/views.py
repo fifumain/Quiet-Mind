@@ -5,12 +5,15 @@ from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
+from apps.core.cache import CachedListMixin
+
 from .filters import BookFilter
 from .models import Book, FeaturedBook
 from .serializers import BookSerializer, FeaturedBookSerializer
 
 
-class BookViewSet(viewsets.ReadOnlyModelViewSet):
+class BookViewSet(CachedListMixin, viewsets.ReadOnlyModelViewSet):
+    cache_model_name = "book"
     queryset = Book.objects.select_related("author").prefetch_related("categories")
     serializer_class = BookSerializer
     permission_classes = [AllowAny]
