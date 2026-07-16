@@ -1,7 +1,10 @@
+from django.conf import settings
 from django.contrib import admin
 from django.urls import include, path
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 from rest_framework.permissions import AllowAny
+
+from .dev_views import test_console
 
 urlpatterns = [
     path("admin/", admin.site.urls),
@@ -21,3 +24,6 @@ urlpatterns = [
         name="redoc",
     ),
 ]
+
+if settings.DEBUG:
+    urlpatterns += [path("test-console/", test_console, name="test-console")]

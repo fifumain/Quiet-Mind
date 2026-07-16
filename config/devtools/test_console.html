@@ -1,0 +1,639 @@
+<title>Psychology Companion — Test Console</title>
+<style>
+  :root {
+    --ink: #24221d;
+    --ink-dim: #5b574c;
+    --paper: #efeae0;
+    --surface: #ffffff;
+    --accent: #3e6e64;
+    --accent-strong: #2c514a;
+    --accent-soft: #dce6e2;
+    --line: #dad3c4;
+    --danger: #a8452f;
+    --danger-soft: #f2ddd6;
+    --radius: 10px;
+    --mono: ui-monospace, "SF Mono", "Roboto Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ink: #ede9df;
+      --ink-dim: #b3ada0;
+      --paper: #1b1917;
+      --surface: #242220;
+      --accent: #6fa89c;
+      --accent-strong: #8fc0b5;
+      --accent-soft: #24312e;
+      --line: #37342d;
+      --danger: #d98a76;
+      --danger-soft: #3a2620;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #ede9df;
+    --ink-dim: #b3ada0;
+    --paper: #1b1917;
+    --surface: #242220;
+    --accent: #6fa89c;
+    --accent-strong: #8fc0b5;
+    --accent-soft: #24312e;
+    --line: #37342d;
+    --danger: #d98a76;
+    --danger-soft: #3a2620;
+  }
+  :root[data-theme="light"] {
+    --ink: #24221d;
+    --ink-dim: #5b574c;
+    --paper: #efeae0;
+    --surface: #ffffff;
+    --accent: #3e6e64;
+    --accent-strong: #2c514a;
+    --accent-soft: #dce6e2;
+    --line: #dad3c4;
+    --danger: #a8452f;
+    --danger-soft: #f2ddd6;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+  .app {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    min-height: 100vh;
+  }
+  @media (max-width: 720px) {
+    .app { grid-template-columns: 1fr; }
+    .rail { position: sticky; top: 0; z-index: 5; }
+  }
+
+  .rail {
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 14px;
+    gap: 24px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 6px;
+  }
+  .brand .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--accent);
+    flex-shrink: 0;
+  }
+  .brand h1 {
+    font-size: 15px;
+    font-weight: 650;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  .brand p {
+    margin: 0;
+    font-size: 11px;
+    color: var(--ink-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  nav { display: flex; flex-direction: column; gap: 2px; }
+  .tab {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 10px;
+    border-radius: var(--radius);
+    border: none;
+    background: transparent;
+    color: var(--ink-dim);
+    font: inherit;
+    font-weight: 550;
+    text-align: left;
+    cursor: pointer;
+  }
+  .tab:hover { background: var(--accent-soft); color: var(--ink); }
+  .tab[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-strong); }
+  .tab svg { width: 16px; height: 16px; flex-shrink: 0; }
+
+  .conn {
+    margin-top: auto;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .conn label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-dim);
+  }
+  .conn input {
+    width: 100%;
+    font: 12px var(--mono);
+    padding: 6px 7px;
+    border-radius: 6px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .status-row { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--ink-dim); }
+  .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 3px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 600;
+    background: var(--accent-soft); color: var(--accent-strong);
+  }
+  .pill.off { background: var(--danger-soft); color: var(--danger); }
+  .pill .dot2 { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+
+  main { padding: 28px 32px; max-width: 880px; }
+  @media (max-width: 720px) { main { padding: 18px; } }
+
+  h2 { font-size: 19px; margin: 0 0 4px; letter-spacing: -0.01em; text-wrap: balance; }
+  .subtitle { color: var(--ink-dim); margin: 0 0 22px; font-size: 13px; }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 12px; }
+  .field label { font-size: 11.5px; font-weight: 600; color: var(--ink-dim); }
+  .field input, .field select {
+    font: inherit;
+    padding: 8px 10px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .field input:focus, .field select:focus, textarea:focus, button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+
+  button.primary {
+    font: inherit;
+    font-weight: 600;
+    padding: 8px 16px;
+    border-radius: 7px;
+    border: none;
+    background: var(--accent);
+    color: var(--paper);
+    cursor: pointer;
+  }
+  button.primary:hover { background: var(--accent-strong); }
+  button.primary:disabled { opacity: 0.5; cursor: default; }
+  button.ghost {
+    font: inherit;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 7px;
+    border: 1px solid var(--line);
+    background: transparent;
+    color: var(--ink-dim);
+    cursor: pointer;
+  }
+  button.ghost:hover { border-color: var(--danger); color: var(--danger); }
+
+  .banner {
+    display: none;
+    padding: 9px 12px;
+    border-radius: 8px;
+    background: var(--danger-soft);
+    color: var(--danger);
+    font-size: 12.5px;
+    margin-bottom: 14px;
+  }
+  .banner.show { display: block; }
+
+  .whoami {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 14px; border-radius: 10px;
+    background: var(--accent-soft); color: var(--accent-strong);
+    margin-bottom: 18px; font-size: 13px; font-weight: 600;
+  }
+
+  /* Chat */
+  .chat-shell { display: flex; flex-direction: column; height: calc(100vh - 130px); }
+  .chat-head { display: flex; justify-content: space-between; align-items: flex-start; }
+  .thread {
+    flex: 1; overflow-y: auto; padding: 6px 2px 14px;
+    display: flex; flex-direction: column; gap: 10px;
+  }
+  .msg { max-width: 78%; padding: 9px 12px; border-radius: 12px; font-size: 13.5px; }
+  .msg .meta { font: 10.5px var(--mono); opacity: 0.6; margin-top: 4px; }
+  .msg.user { align-self: flex-end; background: var(--surface); border: 1px solid var(--line); border-bottom-right-radius: 3px; }
+  .msg.assistant { align-self: flex-start; background: var(--accent-soft); color: var(--ink); border-bottom-left-radius: 3px; }
+  .msg.pending { opacity: 0.55; font-style: italic; }
+  .empty-hint { color: var(--ink-dim); font-size: 13px; padding: 20px 4px; }
+
+  .composer { display: flex; gap: 8px; padding-top: 12px; border-top: 1px solid var(--line); }
+  .composer textarea {
+    flex: 1; resize: none; font: inherit; padding: 9px 12px;
+    border-radius: 9px; border: 1px solid var(--line); background: var(--surface); color: var(--ink);
+    min-height: 40px; max-height: 120px;
+  }
+
+  /* Library */
+  .filters { display: flex; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; align-items: center; }
+  .segmented { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+  .segmented button {
+    font: inherit; font-weight: 600; font-size: 12.5px; padding: 7px 14px; border: none;
+    background: var(--surface); color: var(--ink-dim); cursor: pointer;
+  }
+  .segmented button.active { background: var(--accent); color: var(--paper); }
+  .filters select, .filters input[type="search"] {
+    font: inherit; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--line);
+    background: var(--surface); color: var(--ink);
+  }
+
+  .lib-list { display: flex; flex-direction: column; gap: 10px; }
+  .lib-item { border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; background: var(--surface); }
+  .lib-item .text { font-size: 13.5px; margin: 0 0 6px; }
+  .lib-item .byline { font-size: 12px; color: var(--ink-dim); display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+  .tag {
+    font: 10.5px var(--mono); text-transform: uppercase; letter-spacing: 0.03em;
+    background: var(--accent-soft); color: var(--accent-strong); padding: 2px 6px; border-radius: 5px;
+  }
+  .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 14px; font-size: 12.5px; color: var(--ink-dim); }
+  .pager button { font: inherit; }
+
+  .hidden { display: none !important; }
+  ::selection { background: var(--accent-soft); }
+</style>
+
+<div class="app">
+  <aside class="rail">
+    <div class="brand">
+      <span class="dot"></span>
+      <div>
+        <h1>Companion Console</h1>
+        <p>API test harness</p>
+      </div>
+    </div>
+
+    <nav role="tablist">
+      <button class="tab" data-tab="auth" role="tab" aria-selected="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="8" r="3.4"/><path d="M5 20c1.2-4 4-6 7-6s5.8 2 7 6"/></svg>
+        Auth
+      </button>
+      <button class="tab" data-tab="chat" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v10H8l-4 4V5z"/></svg>
+        Chat
+      </button>
+      <button class="tab" data-tab="library" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4.5h6v15H4zM14 4.5h6v15h-6z"/></svg>
+        Library
+      </button>
+    </nav>
+
+    <div class="conn">
+      <label for="baseUrl">Server URL</label>
+      <input id="baseUrl" value="http://localhost:8000" spellcheck="false" />
+      <div class="status-row">
+        <span id="connPill" class="pill off"><span class="dot2"></span>signed out</span>
+      </div>
+    </div>
+  </aside>
+
+  <main>
+    <!-- AUTH -->
+    <section id="tab-auth">
+      <h2>Authenticate</h2>
+      <p class="subtitle">Register a user or sign in with an existing one. The access token is kept in this tab only.</p>
+      <div id="whoami" class="whoami hidden"></div>
+      <div id="authBanner" class="banner"></div>
+      <div class="grid-2">
+        <div class="card">
+          <strong style="font-size:13px;">Create account</strong>
+          <div style="height:12px"></div>
+          <div class="field"><label for="regUser">Username</label><input id="regUser" autocomplete="off" /></div>
+          <div class="field"><label for="regEmail">Email</label><input id="regEmail" type="email" autocomplete="off" /></div>
+          <div class="field"><label for="regPass">Password</label><input id="regPass" type="password" autocomplete="new-password" /></div>
+          <button class="primary" id="registerBtn">Register</button>
+        </div>
+        <div class="card">
+          <strong style="font-size:13px;">Sign in</strong>
+          <div style="height:12px"></div>
+          <div class="field"><label for="loginUser">Username</label><input id="loginUser" autocomplete="off" /></div>
+          <div class="field"><label for="loginPass">Password</label><input id="loginPass" type="password" autocomplete="current-password" /></div>
+          <button class="primary" id="loginBtn">Sign in</button>
+          <div style="height:8px"></div>
+          <button class="ghost" id="logoutBtn">Sign out</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- CHAT -->
+    <section id="tab-chat" class="hidden">
+      <div class="chat-shell">
+        <div class="chat-head">
+          <div>
+            <h2>Chat with Alex</h2>
+            <p class="subtitle" style="margin-bottom:10px;">One session per account · sliding-window context</p>
+          </div>
+          <button class="ghost" id="resetChatBtn">Clear history</button>
+        </div>
+        <div id="chatBanner" class="banner"></div>
+        <div id="thread" class="thread"><p class="empty-hint">Sign in to load your conversation.</p></div>
+        <div class="composer">
+          <textarea id="chatInput" placeholder="Say something to Alex…" rows="1"></textarea>
+          <button class="primary" id="sendBtn">Send</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LIBRARY -->
+    <section id="tab-library" class="hidden">
+      <h2>Library</h2>
+      <p class="subtitle">Browse the read-only quote and book catalog Alex draws on.</p>
+      <div class="filters">
+        <div class="segmented">
+          <button data-kind="quotes" class="active">Quotes</button>
+          <button data-kind="books">Books</button>
+        </div>
+        <select id="categoryFilter"><option value="">All categories</option></select>
+        <input type="search" id="librarySearch" placeholder="Search…" />
+      </div>
+      <div id="libraryBanner" class="banner"></div>
+      <div id="libList" class="lib-list"></div>
+      <div class="pager">
+        <button class="ghost" id="prevPage" disabled>← Previous</button>
+        <span id="pageInfo"></span>
+        <button class="ghost" id="nextPage" disabled>Next →</button>
+      </div>
+    </section>
+  </main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  const state = {
+    baseUrl: localStorage.getItem("cc_baseUrl") || "http://localhost:8000",
+    access: localStorage.getItem("cc_access") || null,
+    refresh: localStorage.getItem("cc_refresh") || null,
+    username: localStorage.getItem("cc_username") || null,
+    libKind: "quotes",
+    libNextUrl: null,
+    libPrevUrl: null,
+    libCurrentUrl: null,
+  };
+
+  const $ = (sel) => document.querySelector(sel);
+  const baseUrlInput = $("#baseUrl");
+  baseUrlInput.value = state.baseUrl;
+  baseUrlInput.addEventListener("change", () => {
+    state.baseUrl = baseUrlInput.value.trim().replace(/\/$/, "");
+    localStorage.setItem("cc_baseUrl", state.baseUrl);
+  });
+
+  function api(path, opts) {
+    opts = opts || {};
+    const headers = Object.assign({ "Content-Type": "application/json" }, opts.headers || {});
+    if (state.access && !opts.noAuth) headers["Authorization"] = "Bearer " + state.access;
+    return fetch(state.baseUrl + path, Object.assign({}, opts, { headers }))
+      .then(async (res) => {
+        const text = await res.text();
+        let data = null;
+        try { data = text ? JSON.parse(text) : null; } catch (e) { data = text; }
+        return { ok: res.ok, status: res.status, data };
+      })
+      .catch((err) => ({ ok: false, status: 0, data: { detail: "Network error — is the server running and CORS enabled? (" + err.message + ")" } }));
+  }
+
+  function showBanner(id, msg) {
+    const el = $(id);
+    if (!msg) { el.classList.remove("show"); el.textContent = ""; return; }
+    el.textContent = msg;
+    el.classList.add("show");
+  }
+
+  function errText(res) {
+    if (!res.data) return "Request failed (" + res.status + ").";
+    if (typeof res.data === "string") return res.data.slice(0, 200);
+    if (res.data.detail) return res.data.detail;
+    return Object.entries(res.data).map(([k, v]) => k + ": " + (Array.isArray(v) ? v.join(" ") : v)).join(" · ");
+  }
+
+  // ---- tabs ----
+  document.querySelectorAll(".tab").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", "false"));
+      btn.setAttribute("aria-selected", "true");
+      ["auth", "chat", "library"].forEach((name) => {
+        $("#tab-" + name).classList.toggle("hidden", name !== btn.dataset.tab);
+      });
+      if (btn.dataset.tab === "chat" && state.access) loadChat();
+      if (btn.dataset.tab === "library") loadLibrary(state.libCurrentUrl || buildLibraryUrl());
+    });
+  });
+
+  // ---- auth ----
+  function setSession(access, refresh, username) {
+    state.access = access; state.refresh = refresh; state.username = username;
+    localStorage.setItem("cc_access", access || "");
+    localStorage.setItem("cc_refresh", refresh || "");
+    localStorage.setItem("cc_username", username || "");
+    renderAuthState();
+  }
+
+  function renderAuthState() {
+    const pill = $("#connPill");
+    const who = $("#whoami");
+    if (state.access) {
+      pill.className = "pill";
+      pill.innerHTML = '<span class="dot2"></span>' + state.username;
+      who.classList.remove("hidden");
+      who.textContent = "Signed in as " + state.username;
+    } else {
+      pill.className = "pill off";
+      pill.innerHTML = '<span class="dot2"></span>signed out';
+      who.classList.add("hidden");
+    }
+  }
+
+  $("#registerBtn").addEventListener("click", async () => {
+    showBanner("#authBanner", null);
+    const body = { username: $("#regUser").value.trim(), email: $("#regEmail").value.trim(), password: $("#regPass").value };
+    const res = await api("/api/v1/auth/register/", { method: "POST", body: JSON.stringify(body), noAuth: true });
+    if (!res.ok) return showBanner("#authBanner", errText(res));
+    showBanner("#authBanner", null);
+    $("#loginUser").value = body.username;
+    alert("Account created — now sign in on the right.");
+  });
+
+  $("#loginBtn").addEventListener("click", async () => {
+    showBanner("#authBanner", null);
+    const username = $("#loginUser").value.trim();
+    const res = await api("/api/v1/auth/token/", { method: "POST", body: JSON.stringify({ username, password: $("#loginPass").value }), noAuth: true });
+    if (!res.ok) return showBanner("#authBanner", errText(res));
+    setSession(res.data.access, res.data.refresh, username);
+  });
+
+  $("#logoutBtn").addEventListener("click", async () => {
+    if (state.refresh) await api("/api/v1/auth/token/blacklist/", { method: "POST", body: JSON.stringify({ refresh: state.refresh }) });
+    setSession(null, null, null);
+    $("#thread").innerHTML = '<p class="empty-hint">Sign in to load your conversation.</p>';
+  });
+
+  // ---- chat ----
+  function renderThread(messages) {
+    const thread = $("#thread");
+    if (!messages.length) { thread.innerHTML = '<p class="empty-hint">No messages yet — say hello below.</p>'; return; }
+    thread.innerHTML = messages.map(renderMsg).join("");
+    thread.scrollTop = thread.scrollHeight;
+  }
+  function renderMsg(m, pending) {
+    const time = m.created_at ? new Date(m.created_at).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) : "";
+    return '<div class="msg ' + m.role + (pending ? " pending" : "") + '"><div>' + escapeHtml(m.content) + "</div>" +
+      (time ? '<div class="meta">' + m.role + " · " + time + "</div>" : "") + "</div>";
+  }
+  function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+  async function loadChat() {
+    showBanner("#chatBanner", null);
+    const res = await api("/api/v1/chat/session/messages/");
+    if (!res.ok) return showBanner("#chatBanner", errText(res));
+    renderThread(res.data.results || []);
+  }
+
+  async function sendMessage() {
+    const input = $("#chatInput");
+    const content = input.value.trim();
+    if (!content || !state.access) return;
+    input.value = "";
+    const thread = $("#thread");
+    const hint = thread.querySelector(".empty-hint");
+    if (hint) hint.remove();
+    const nowIso = new Date().toISOString();
+    thread.insertAdjacentHTML("beforeend", renderMsg({ role: "user", content, created_at: nowIso }));
+    thread.insertAdjacentHTML("beforeend", '<div class="msg assistant pending" id="pendingReply">…thinking</div>');
+    thread.scrollTop = thread.scrollHeight;
+    $("#sendBtn").disabled = true;
+    showBanner("#chatBanner", null);
+
+    const res = await api("/api/v1/chat/session/messages/", { method: "POST", body: JSON.stringify({ content }) });
+    $("#sendBtn").disabled = false;
+    const pending = document.getElementById("pendingReply");
+    if (pending) pending.remove();
+
+    if (!res.ok) {
+      showBanner("#chatBanner", errText(res));
+      return;
+    }
+    thread.insertAdjacentHTML("beforeend", renderMsg(res.data.assistant_message));
+    thread.scrollTop = thread.scrollHeight;
+  }
+  $("#sendBtn").addEventListener("click", sendMessage);
+  $("#chatInput").addEventListener("keydown", (e) => {
+    if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+  $("#resetChatBtn").addEventListener("click", async () => {
+    if (!state.access) return;
+    if (!confirm("Clear the entire chat history?")) return;
+    const res = await api("/api/v1/chat/session/reset/", { method: "DELETE" });
+    if (!res.ok && res.status !== 204) return showBanner("#chatBanner", errText(res));
+    $("#thread").innerHTML = '<p class="empty-hint">No messages yet — say hello below.</p>';
+  });
+
+  // ---- library ----
+  async function loadCategories() {
+    const res = await api("/api/v1/categories/", { noAuth: true });
+    if (!res.ok) return;
+    const select = $("#categoryFilter");
+    (res.data.results || []).forEach((c) => {
+      const opt = document.createElement("option");
+      opt.value = c.slug; opt.textContent = c.name;
+      select.appendChild(opt);
+    });
+  }
+
+  function buildLibraryUrl() {
+    const params = new URLSearchParams();
+    const cat = $("#categoryFilter").value;
+    const q = $("#librarySearch").value.trim();
+    if (cat) params.set("category", cat);
+    if (q) params.set("search", q);
+    const qs = params.toString();
+    return "/api/v1/" + state.libKind + "/" + (qs ? "?" + qs : "");
+  }
+
+  function renderLibrary(payload) {
+    const list = $("#libList");
+    const items = payload.results || [];
+    if (!items.length) { list.innerHTML = '<p class="empty-hint">Nothing matches those filters.</p>'; }
+    else if (state.libKind === "quotes") {
+      list.innerHTML = items.map((q) => (
+        '<div class="lib-item"><p class="text">“' + escapeHtml(q.text) + '”</p>' +
+        '<div class="byline"><span>' + escapeHtml(q.author.name) + "</span>" +
+        (q.source ? '<span>· ' + escapeHtml(q.source) + "</span>" : "") +
+        q.categories.map((c) => '<span class="tag">' + c.slug + "</span>").join("") + "</div></div>"
+      )).join("");
+    } else {
+      list.innerHTML = items.map((b) => (
+        '<div class="lib-item"><p class="text"><strong>' + escapeHtml(b.title) + "</strong>" +
+        (b.publication_year ? " (" + b.publication_year + ")" : "") + "</p>" +
+        '<div class="byline"><span>' + escapeHtml(b.author.name) + "</span>" +
+        b.categories.map((c) => '<span class="tag">' + c.slug + "</span>").join("") + "</div>" +
+        (b.description ? '<p class="byline" style="margin-top:6px;">' + escapeHtml(b.description) + "</p>" : "") + "</div>"
+      )).join("");
+    }
+    $("#pageInfo").textContent = "count: " + (payload.count ?? items.length);
+    state.libNextUrl = payload.next; state.libPrevUrl = payload.previous;
+    $("#nextPage").disabled = !state.libNextUrl;
+    $("#prevPage").disabled = !state.libPrevUrl;
+  }
+
+  async function loadLibrary(path) {
+    showBanner("#libraryBanner", null);
+    const isAbsolute = /^https?:\/\//.test(path);
+    const url = isAbsolute ? path.replace(/^https?:\/\/[^/]+/, "") : path;
+    state.libCurrentUrl = url;
+    const res = await api(url, { noAuth: true });
+    if (!res.ok) return showBanner("#libraryBanner", errText(res));
+    renderLibrary(res.data);
+  }
+
+  document.querySelectorAll(".segmented button").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".segmented button").forEach((b) => b.classList.remove("active"));
+      btn.classList.add("active");
+      state.libKind = btn.dataset.kind;
+      loadLibrary(buildLibraryUrl());
+    });
+  });
+  $("#categoryFilter").addEventListener("change", () => loadLibrary(buildLibraryUrl()));
+  let searchTimer;
+  $("#librarySearch").addEventListener("input", () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => loadLibrary(buildLibraryUrl()), 350);
+  });
+  $("#prevPage").addEventListener("click", () => state.libPrevUrl && loadLibrary(state.libPrevUrl));
+  $("#nextPage").addEventListener("click", () => state.libNextUrl && loadLibrary(state.libNextUrl));
+
+  renderAuthState();
+  loadCategories();
+})();
+</script>
