@@ -47,3 +47,6 @@ celerybeat.pid
 Thumbs.db
 apps/quotes/management/commands/seed_quotes.py
 apps/books/management/commands/seed_books.py
+
+# Project instructions for Claude Code — not meant to be public
+CLAUDE.md

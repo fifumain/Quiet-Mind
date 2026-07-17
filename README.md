@@ -5,6 +5,28 @@ therapist, not a diagnosis engine. It listens, asks guiding questions, and occas
 brings in a relevant quote or book from a curated library. Django REST Framework API backend,
 Groq-powered (`llama-3.3-70b-versatile`) via OpenAI-compatible function calling.
 
+## Screenshots
+
+<table>
+  <tr>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/daily_content.webp" alt="Today tab — featured book and quote of the day" width="100%"><br>
+      <sub><b>Today</b> — featured book + quote of the day</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/knowledge_base.webp" alt="Library tab — quote and book archive" width="100%"><br>
+      <sub><b>Library</b> — quote/book archive, filterable by category</sub>
+    </td>
+    <td align="center" width="33%">
+      <img src="docs/screenshots/chat.png" alt="Chat tab — conversation with Alex" width="100%"><br>
+      <sub><b>Chat</b> — a conversation with Alex</sub>
+    </td>
+  </tr>
+</table>
+
+*From the dev-only test console (`/test-console/`, gated on `DEBUG=True`) — used to exercise the
+full API by hand without a separate frontend.*
+
 ## Stack
 
 - **Backend:** Django + Django REST Framework (API-only, JSON)
