@@ -1,9 +1,9 @@
+import os
 from datetime import timedelta
 from pathlib import Path
 
 from celery.schedules import crontab
 from dotenv import load_dotenv
-import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
@@ -77,7 +77,9 @@ DATABASES = {
 }
 
 AUTH_PASSWORD_VALIDATORS = [
-    {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
+    {
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"
+    },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
     {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
@@ -124,9 +126,7 @@ REST_FRAMEWORK = {
     "DEFAULT_THROTTLE_RATES": {
         "anon": "120/minute",
         "user": "300/minute",
-        # Chat is temporarily exempted (see ChatMessageListCreateView) while
-        # testing — rate kept here so it's a one-line change to re-enable.
-        "chat_message": "30/hour",
+        "chat_message": "15/minute",
     },
 }
 

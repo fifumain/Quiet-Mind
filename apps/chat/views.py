@@ -7,6 +7,7 @@ from rest_framework.views import APIView
 from .models import ChatMessage, ChatSession
 from .serializers import ChatMessageSerializer, ChatSessionSerializer
 from .services import conversation
+from .throttling import ChatMessageThrottle
 
 
 class ChatSessionView(generics.RetrieveAPIView):
@@ -21,11 +22,8 @@ class ChatSessionView(generics.RetrieveAPIView):
 class ChatMessageListCreateView(generics.ListCreateAPIView):
     serializer_class = ChatMessageSerializer
     permission_classes = [IsAuthenticated]
-    # Throttling temporarily disabled while testing (overrides the global
-    # Anon/User throttle too, not just ChatMessageThrottle) — re-enable with
-    # `throttle_classes = [ChatMessageThrottle]` + `throttle_scope = "chat_message"`
-    # before real deployment.
-    throttle_classes = []
+    throttle_classes = [ChatMessageThrottle]
+    throttle_scope = "chat_message"
 
     def get_session(self):
         session, _ = ChatSession.objects.get_or_create(user=self.request.user)
