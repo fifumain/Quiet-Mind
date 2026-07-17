@@ -305,6 +305,10 @@
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 4.5h6v15H4zM14 4.5h6v15h-6z"/></svg>
         Library
       </button>
+      <button class="tab" data-tab="today" role="tab" aria-selected="false">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 9.5h16M8 3v4M16 3v4"/></svg>
+        Today
+      </button>
     </nav>
 
     <div class="conn">
@@ -383,6 +387,25 @@
         <button class="ghost" id="nextPage" disabled>Next →</button>
       </div>
     </section>
+
+    <!-- TODAY -->
+    <section id="tab-today" class="hidden">
+      <h2>Today</h2>
+      <p class="subtitle">The book of the week and quote of the day currently surfaced to users.</p>
+      <div id="todayBanner" class="banner"></div>
+      <div class="grid-2">
+        <div class="card">
+          <strong style="font-size:13px;">📖 Featured book</strong>
+          <div style="height:12px"></div>
+          <div id="featuredBookCard"><p class="empty-hint">Loading…</p></div>
+        </div>
+        <div class="card">
+          <strong style="font-size:13px;">💬 Quote of the day</strong>
+          <div style="height:12px"></div>
+          <div id="quoteOfDayCard"><p class="empty-hint">Loading…</p></div>
+        </div>
+      </div>
+    </section>
   </main>
 </div>
 
@@ -442,11 +465,12 @@
     btn.addEventListener("click", () => {
       document.querySelectorAll(".tab").forEach((b) => b.setAttribute("aria-selected", "false"));
       btn.setAttribute("aria-selected", "true");
-      ["auth", "chat", "library"].forEach((name) => {
+      ["auth", "chat", "library", "today"].forEach((name) => {
         $("#tab-" + name).classList.toggle("hidden", name !== btn.dataset.tab);
       });
       if (btn.dataset.tab === "chat" && state.access) loadChat();
       if (btn.dataset.tab === "library") loadLibrary(state.libCurrentUrl || buildLibraryUrl());
+      if (btn.dataset.tab === "today") loadToday();
     });
   });
 
@@ -632,6 +656,50 @@
   });
   $("#prevPage").addEventListener("click", () => state.libPrevUrl && loadLibrary(state.libPrevUrl));
   $("#nextPage").addEventListener("click", () => state.libNextUrl && loadLibrary(state.libNextUrl));
+
+  // ---- today ----
+  function renderNotSetCard(el, label) {
+    el.innerHTML = '<p class="empty-hint">' + label + "</p>";
+  }
+
+  function renderFeaturedBook(featured) {
+    const el = $("#featuredBookCard");
+    const b = featured.book;
+    el.innerHTML =
+      '<p class="text"><strong>' + escapeHtml(b.title) + "</strong>" +
+      (b.publication_year ? " (" + b.publication_year + ")" : "") + "</p>" +
+      '<div class="byline"><span>' + escapeHtml(b.author.name) + "</span>" +
+      b.categories.map((c) => '<span class="tag">' + c.slug + "</span>").join("") + "</div>" +
+      (b.description ? '<p class="byline" style="margin-top:6px;">' + escapeHtml(b.description) + "</p>" : "") +
+      '<p class="byline" style="margin-top:8px;">Week of ' + featured.week_start + "</p>";
+  }
+
+  function renderQuoteOfDay(featured) {
+    const el = $("#quoteOfDayCard");
+    const q = featured.quote;
+    el.innerHTML =
+      '<p class="text">“' + escapeHtml(q.text) + '”</p>' +
+      '<div class="byline"><span>' + escapeHtml(q.author.name) + "</span>" +
+      (q.source ? '<span>· ' + escapeHtml(q.source) + "</span>" : "") +
+      q.categories.map((c) => '<span class="tag">' + c.slug + "</span>").join("") + "</div>" +
+      '<p class="byline" style="margin-top:8px;">' + featured.day + "</p>";
+  }
+
+  async function loadToday() {
+    showBanner("#todayBanner", null);
+    const [bookRes, quoteRes] = await Promise.all([
+      api("/api/v1/featured-books/current/", { noAuth: true }),
+      api("/api/v1/quote-of-the-day/current/", { noAuth: true }),
+    ]);
+
+    if (bookRes.ok) renderFeaturedBook(bookRes.data);
+    else if (bookRes.status === 404) renderNotSetCard($("#featuredBookCard"), "No featured book set yet.");
+    else showBanner("#todayBanner", errText(bookRes));
+
+    if (quoteRes.ok) renderQuoteOfDay(quoteRes.data);
+    else if (quoteRes.status === 404) renderNotSetCard($("#quoteOfDayCard"), "No quote of the day set yet.");
+    else showBanner("#todayBanner", errText(quoteRes));
+  }
 
   renderAuthState();
   loadCategories();

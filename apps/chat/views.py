@@ -45,6 +45,7 @@ class ChatMessageListCreateView(generics.ListCreateAPIView):
         session = user_message.session
 
         conversation.append_and_cache(session.id, "user", user_message.content)
+        session.refresh_from_db(fields=["summary"])
 
         try:
             assistant_text = conversation.get_assistant_reply(session)
@@ -73,4 +74,5 @@ class ChatResetView(APIView):
         session, _ = ChatSession.objects.get_or_create(user=request.user)
         session.messages.all().delete()
         cache.delete(f"chat:context:{session.id}")
+        ChatSession.objects.filter(id=session.id).update(summary="")
         return Response(status=status.HTTP_204_NO_CONTENT)

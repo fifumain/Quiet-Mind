@@ -148,6 +148,7 @@ GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_TEMPERATURE = float(os.environ.get("GROQ_TEMPERATURE", "0.6"))
 GROQ_MAX_TOKENS = int(os.environ.get("GROQ_MAX_TOKENS", "300"))
+CHAT_SUMMARY_MAX_TOKENS = int(os.environ.get("CHAT_SUMMARY_MAX_TOKENS", "200"))
 
 CHAT_CONTEXT_WINDOW_SIZE = 12
 CHAT_CONTEXT_CACHE_TTL_SECONDS = 60 * 60
@@ -169,5 +170,9 @@ CELERY_BEAT_SCHEDULE = {
     "pick-featured-book-weekly": {
         "task": "apps.books.tasks.pick_featured_book",
         "schedule": crontab(day_of_week="monday", hour=3, minute=0),
+    },
+    "pick-quote-of-the-day": {
+        "task": "apps.quotes.tasks.pick_quote_of_the_day",
+        "schedule": crontab(hour=3, minute=0),
     },
 }

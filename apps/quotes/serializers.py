@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Author, Category, Quote
+from .models import Author, Category, Quote, QuoteOfTheDay
 
 
 class AuthorSerializer(serializers.ModelSerializer):
@@ -22,3 +22,11 @@ class QuoteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quote
         fields = ["id", "text", "author", "categories", "source"]
+
+
+class QuoteOfTheDaySerializer(serializers.ModelSerializer):
+    quote = QuoteSerializer(read_only=True)
+
+    class Meta:
+        model = QuoteOfTheDay
+        fields = ["day", "quote"]

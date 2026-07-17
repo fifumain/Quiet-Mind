@@ -37,7 +37,7 @@ def get_client():
     return _client
 
 
-def create_completion(messages, tools=None, tool_choice="auto"):
+def create_completion(messages, tools=None, tool_choice="auto", max_tokens=None):
     client = get_client()
     last_exc = None
     for attempt in range(MAX_ATTEMPTS):
@@ -46,7 +46,7 @@ def create_completion(messages, tools=None, tool_choice="auto"):
                 "model": settings.GROQ_MODEL,
                 "messages": messages,
                 "temperature": settings.GROQ_TEMPERATURE,
-                "max_tokens": settings.GROQ_MAX_TOKENS,
+                "max_tokens": max_tokens or settings.GROQ_MAX_TOKENS,
             }
             if tools is not None:
                 kwargs["tools"] = tools

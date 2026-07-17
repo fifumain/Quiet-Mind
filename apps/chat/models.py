@@ -8,6 +8,7 @@ class ChatSession(TimestampedModel):
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="chat_session"
     )
+    summary = models.TextField(blank=True, default="")
 
     def __str__(self):
         return f"Chat session for {self.user}"

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import Author, Category, Quote
+from .models import Author, Category, Quote, QuoteOfTheDay
 
 
 @admin.register(Author)
@@ -29,3 +29,11 @@ class QuoteAdmin(ModelAdmin):
     @admin.display(description="Text")
     def short_text(self, obj):
         return obj.text[:80]
+
+
+@admin.register(QuoteOfTheDay)
+class QuoteOfTheDayAdmin(ModelAdmin):
+    list_display = ["day", "quote"]
+    list_select_related = ["quote"]
+    date_hierarchy = "day"
+    autocomplete_fields = ["quote"]

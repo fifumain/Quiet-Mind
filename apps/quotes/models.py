@@ -37,3 +37,14 @@ class Quote(TimestampedModel):
 
     def __str__(self):
         return f"{self.text[:50]} — {self.author.name}"
+
+
+class QuoteOfTheDay(TimestampedModel):
+    quote = models.ForeignKey(Quote, on_delete=models.CASCADE, related_name="featured_history")
+    day = models.DateField(unique=True)
+
+    class Meta:
+        ordering = ["-day"]
+
+    def __str__(self):
+        return f"{self.day}: {self.quote.text[:40]}"
