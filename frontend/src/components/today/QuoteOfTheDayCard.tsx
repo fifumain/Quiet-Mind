@@ -1,28 +1,38 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, type ViewStyle } from 'react-native';
 import type { components } from '../../api/generated/schema';
 import { theme } from '../../theme/theme';
+import { GlassCard } from '../common/GlassCard';
 
 type Quote = components['schemas']['Quote'];
 
-export function QuoteOfTheDayCard({ quote }: { quote: Quote }) {
+export function QuoteOfTheDayCard({ quote, style }: { quote: Quote; style?: ViewStyle }) {
   return (
-    <View style={styles.card}>
+    <GlassCard style={style}>
+      <Text style={styles.label}>Цитата дня</Text>
       <Text style={styles.text}>"{quote.text}"</Text>
-      <Text style={styles.author}>— {quote.author.name}</Text>
-      {quote.source ? <Text style={styles.source}>{quote.source}</Text> : null}
-    </View>
+      <Text style={styles.attrib}>
+        — {quote.author.name}
+        {quote.source ? `, ${quote.source}` : ''}
+      </Text>
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    padding: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: '#e2e2e2',
-    gap: theme.spacing.xs,
+  label: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: theme.colors.textMuted,
+    fontWeight: '700',
+    marginBottom: theme.spacing.md,
   },
-  text: { fontSize: theme.fontSize.lg, fontStyle: 'italic' },
-  author: { fontSize: theme.fontSize.md, color: '#444' },
-  source: { fontSize: theme.fontSize.sm, color: '#888' },
+  text: {
+    fontSize: theme.fontSize.lg,
+    lineHeight: 30,
+    fontWeight: '600',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.md,
+  },
+  attrib: { fontSize: theme.fontSize.sm, color: theme.colors.textSecondary },
 });

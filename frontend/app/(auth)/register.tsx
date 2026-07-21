@@ -1,9 +1,11 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { GlassBackground } from '../../src/components/common/GlassBackground';
+import { SpecularButton } from '../../src/components/common/SpecularButton';
 import { useRegister } from '../../src/hooks/useAuth';
 import { formatApiError } from '../../src/lib/formatApiError';
-import { theme } from '../../src/theme/theme';
+import { glassBlur, theme } from '../../src/theme/theme';
 
 export default function RegisterScreen() {
   const [username, setUsername] = useState('');
@@ -11,73 +13,87 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const register = useRegister();
 
+  const disabled = register.isPending || !username || !email || !password;
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Register</Text>
+    <GlassBackground>
+      <View style={styles.container}>
+        <Text style={styles.brand}>Alex</Text>
+        <Text style={styles.title}>Создать аккаунт</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Username"
-        autoCapitalize="none"
-        value={username}
-        onChangeText={setUsername}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <TextInput
+          style={[styles.input, glassBlur()]}
+          placeholder="Имя пользователя"
+          placeholderTextColor={theme.colors.textMuted}
+          autoCapitalize="none"
+          value={username}
+          onChangeText={setUsername}
+        />
+        <TextInput
+          style={[styles.input, glassBlur()]}
+          placeholder="Email"
+          placeholderTextColor={theme.colors.textMuted}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          style={[styles.input, glassBlur()]}
+          placeholder="Пароль (минимум 8 символов)"
+          placeholderTextColor={theme.colors.textMuted}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+        />
 
-      {register.isError ? (
-        <Text style={styles.error}>{formatApiError(register.error, 'Registration failed. Check your details.')}</Text>
-      ) : null}
+        {register.isError ? (
+          <Text style={styles.error}>{formatApiError(register.error, 'Не удалось зарегистрироваться. Проверьте данные.')}</Text>
+        ) : null}
 
-      <Pressable
-        style={styles.button}
-        disabled={register.isPending || !username || !email || !password}
-        onPress={() => register.mutate({ username, email, password })}
-      >
-        {register.isPending ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.buttonText}>Create account</Text>
-        )}
-      </Pressable>
+        <SpecularButton
+          style={[styles.button, disabled && styles.buttonDisabled]}
+          disabled={disabled}
+          onPress={() => register.mutate({ username, email, password })}
+        >
+          {register.isPending ? (
+            <ActivityIndicator color={theme.gradient[0]} />
+          ) : (
+            <Text style={styles.buttonText}>Зарегистрироваться</Text>
+          )}
+        </SpecularButton>
 
-      <Link href="/login" style={styles.link}>
-        Already have an account? Log in
-      </Link>
-    </View>
+        <Link href="/login" style={styles.link}>
+          Уже есть аккаунт? Войти
+        </Link>
+      </View>
+    </GlassBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', padding: theme.spacing.lg, gap: theme.spacing.md },
-  title: { fontSize: theme.fontSize.xl, marginBottom: theme.spacing.md },
+  container: { flex: 1, justifyContent: 'center', padding: theme.spacing.xl, gap: theme.spacing.md, maxWidth: 420, width: '100%', alignSelf: 'center' },
+  brand: { color: theme.colors.textPrimary, fontSize: theme.fontSize.xl, fontWeight: '700', textAlign: 'center' },
+  title: { color: theme.colors.textSecondary, fontSize: theme.fontSize.md, textAlign: 'center', marginBottom: theme.spacing.md },
   input: {
+    backgroundColor: theme.glass.fill,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.sm,
+    borderColor: theme.glass.border,
+    borderRadius: theme.radius.md,
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: 12,
     fontSize: theme.fontSize.md,
+    color: theme.colors.textPrimary,
   },
+  error: { color: theme.colors.danger, fontSize: theme.fontSize.sm },
   button: {
-    backgroundColor: '#333',
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.sm,
+    backgroundColor: theme.colors.accent,
+    borderRadius: theme.radius.md,
+    paddingVertical: 13,
     alignItems: 'center',
+    marginTop: theme.spacing.xs,
   },
-  buttonText: { color: '#fff', fontSize: theme.fontSize.md },
-  error: { color: 'red' },
-  link: { textAlign: 'center', textDecorationLine: 'underline', marginTop: theme.spacing.md },
+  buttonDisabled: { opacity: 0.5 },
+  buttonText: { color: theme.gradient[0], fontSize: theme.fontSize.md, fontWeight: '700' },
+  link: { textAlign: 'center', color: theme.colors.textSecondary, marginTop: theme.spacing.md, textDecorationLine: 'underline' },
 });

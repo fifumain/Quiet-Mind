@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { ActivityIndicator, Platform, Pressable, StyleSheet, TextInput, View } from 'react-native';
-import { theme } from '../../theme/theme';
+import { ActivityIndicator, Platform, StyleSheet, TextInput, View } from 'react-native';
+import { SpecularButton } from '../common/SpecularButton';
+import { glassBlur, theme } from '../../theme/theme';
 
 interface ComposerProps {
   onSend: (content: string) => void;
@@ -19,10 +20,11 @@ export function Composer({ onSend, disabled, sending }: ComposerProps) {
   };
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, glassBlur()]}>
       <TextInput
         style={styles.input}
-        placeholder="Message Alex..."
+        placeholder="Написать Alex…"
+        placeholderTextColor={theme.colors.textMuted}
         value={value}
         onChangeText={setValue}
         onSubmitEditing={submit}
@@ -43,9 +45,11 @@ export function Composer({ onSend, disabled, sending }: ComposerProps) {
         editable={!disabled}
         multiline
       />
-      <Pressable style={styles.sendButton} onPress={submit} disabled={disabled || !value.trim()}>
-        {sending ? <ActivityIndicator color="#fff" /> : <View style={styles.sendDot} />}
-      </Pressable>
+      <SpecularButton style={styles.sendButton} onPress={submit} disabled={disabled || !value.trim()} radius={theme.radius.sm}>
+        <View style={styles.sendButtonInner}>
+          {sending ? <ActivityIndicator color={theme.colors.textPrimary} /> : <View style={styles.sendDot} />}
+        </View>
+      </SpecularButton>
     </View>
   );
 }
@@ -55,26 +59,27 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     padding: theme.spacing.sm,
     gap: theme.spacing.sm,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
     alignItems: 'flex-end',
+    backgroundColor: theme.glass.fill,
+    borderWidth: 1,
+    borderColor: theme.glass.border,
+    borderRadius: theme.radius.md,
   },
   input: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: theme.radius.md,
-    padding: theme.spacing.sm,
+    paddingHorizontal: theme.spacing.sm,
+    paddingVertical: theme.spacing.sm,
     fontSize: theme.fontSize.md,
+    color: theme.colors.textPrimary,
     maxHeight: 120,
   },
-  sendButton: {
-    backgroundColor: '#333',
-    borderRadius: theme.radius.md,
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.sm,
+  sendButton: { width: 34, height: 34 },
+  sendButtonInner: {
+    flex: 1,
+    backgroundColor: theme.glass.fillStrong,
+    borderRadius: theme.radius.sm,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  sendDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#fff' },
+  sendDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: theme.colors.textPrimary },
 });

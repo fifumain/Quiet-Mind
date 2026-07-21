@@ -18,3 +18,7 @@ export function useFeaturedBook() {
     queryFn: booksApi.getFeaturedBook,
   });
 }
+
+export function useFeaturedBookHistory() {
+  return useResourceList(['featuredBook', 'history'], booksApi.listFeaturedBookHistory, {});
+}

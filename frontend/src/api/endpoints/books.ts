@@ -20,3 +20,10 @@ export async function getFeaturedBook() {
   if (!data) throw new Error('Failed to load featured book');
   return data;
 }
+
+/** Chronological history of every past "book of the week", newest first. */
+export async function listFeaturedBookHistory(filters: ListFilters) {
+  const { data, error } = await client.GET('/api/v1/featured-books/', { params: { query: { page: filters.page } } });
+  if (error) throw error;
+  return data;
+}

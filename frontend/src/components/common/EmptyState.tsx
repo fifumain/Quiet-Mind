@@ -11,5 +11,5 @@ export function EmptyState({ message }: { message: string }) {
 
 const styles = StyleSheet.create({
   container: { padding: theme.spacing.lg, alignItems: 'center' },
-  text: { fontSize: theme.fontSize.md, color: '#666', textAlign: 'center' },
+  text: { fontSize: theme.fontSize.md, color: theme.colors.textSecondary, textAlign: 'center' },
 });

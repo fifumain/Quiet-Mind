@@ -25,3 +25,7 @@ export function useQuoteOfTheDay() {
     queryFn: quotesApi.getQuoteOfTheDay,
   });
 }
+
+export function useQuoteOfTheDayHistory() {
+  return useResourceList(['quoteOfTheDay', 'history'], quotesApi.listQuoteOfTheDayHistory, {});
+}

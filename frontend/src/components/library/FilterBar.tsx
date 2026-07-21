@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import type { components } from '../../api/generated/schema';
-import { theme } from '../../theme/theme';
+import { glassBlur, theme } from '../../theme/theme';
 
 type Category = components['schemas']['Category'];
 
@@ -16,52 +16,56 @@ export function FilterBar({ categories, selectedCategory, onSelectCategory, sear
   return (
     <View style={styles.container}>
       <TextInput
-        style={styles.search}
-        placeholder="Search..."
+        style={[styles.search, glassBlur()]}
+        placeholder="Поиск…"
+        placeholderTextColor={theme.colors.textMuted}
         value={search}
         onChangeText={onChangeSearch}
       />
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.chips}>
-        <TouchableOpacity
-          style={[styles.chip, !selectedCategory && styles.chipActive]}
-          onPress={() => onSelectCategory(undefined)}
-        >
-          <Text style={[styles.chipText, !selectedCategory && styles.chipTextActive]}>All</Text>
-        </TouchableOpacity>
+        <Chip label="Все" active={!selectedCategory} onPress={() => onSelectCategory(undefined)} />
         {categories.map((category) => (
-          <TouchableOpacity
+          <Chip
             key={category.id}
-            style={[styles.chip, selectedCategory === category.slug && styles.chipActive]}
+            label={category.name}
+            active={selectedCategory === category.slug}
             onPress={() => onSelectCategory(category.slug)}
-          >
-            <Text style={[styles.chipText, selectedCategory === category.slug && styles.chipTextActive]}>
-              {category.name}
-            </Text>
-          </TouchableOpacity>
+          />
         ))}
       </ScrollView>
     </View>
   );
 }
 
+function Chip({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) {
+  return (
+    <TouchableOpacity style={[styles.chip, active && styles.chipActive]} onPress={onPress}>
+      <Text style={[styles.chipText, active && styles.chipTextActive]}>{label}</Text>
+    </TouchableOpacity>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { gap: theme.spacing.sm, padding: theme.spacing.md },
+  container: { gap: theme.spacing.md },
   search: {
+    backgroundColor: theme.glass.fillSubtle,
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: theme.radius.sm,
-    padding: theme.spacing.sm,
-    fontSize: theme.fontSize.md,
-  },
-  chips: { gap: theme.spacing.xs },
-  chip: {
-    paddingHorizontal: theme.spacing.md,
-    paddingVertical: theme.spacing.xs,
+    borderColor: theme.glass.border,
     borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: '#ccc',
+    paddingHorizontal: theme.spacing.md,
+    paddingVertical: theme.spacing.sm,
+    fontSize: theme.fontSize.md,
+    color: theme.colors.textPrimary,
   },
-  chipActive: { backgroundColor: '#333', borderColor: '#333' },
-  chipText: { fontSize: theme.fontSize.sm, color: '#333' },
-  chipTextActive: { color: '#fff' },
+  chips: { gap: theme.spacing.sm, paddingRight: theme.spacing.md },
+  chip: {
+    paddingHorizontal: 13,
+    paddingVertical: 6,
+    borderRadius: theme.radius.pill,
+    borderWidth: 1,
+    borderColor: theme.glass.border,
+  },
+  chipActive: { backgroundColor: theme.glass.fillStrong, borderColor: 'transparent' },
+  chipText: { fontSize: theme.fontSize.xs, fontWeight: '600', color: theme.colors.textMuted },
+  chipTextActive: { color: theme.colors.textPrimary },
 });

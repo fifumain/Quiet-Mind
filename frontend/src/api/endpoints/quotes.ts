@@ -32,3 +32,10 @@ export async function getQuoteOfTheDay() {
   if (!data) throw new Error('Failed to load quote of the day');
   return data;
 }
+
+/** Chronological history of every past "quote of the day", newest first. */
+export async function listQuoteOfTheDayHistory(filters: ListFilters) {
+  const { data, error } = await client.GET('/api/v1/quote-of-the-day/', { params: { query: { page: filters.page } } });
+  if (error) throw error;
+  return data;
+}

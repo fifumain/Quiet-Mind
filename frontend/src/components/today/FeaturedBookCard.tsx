@@ -1,32 +1,31 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, type ViewStyle } from 'react-native';
 import type { components } from '../../api/generated/schema';
 import { theme } from '../../theme/theme';
+import { GlassCard } from '../common/GlassCard';
 
 type Book = components['schemas']['Book'];
 
-export function FeaturedBookCard({ book }: { book: Book }) {
+export function FeaturedBookCard({ book, style }: { book: Book; style?: ViewStyle }) {
   return (
-    <View style={styles.card}>
+    <GlassCard style={style}>
+      <Text style={styles.label}>Книга недели</Text>
       <Text style={styles.title}>{book.title}</Text>
       <Text style={styles.author}>{book.author.name}</Text>
-      {book.description ? (
-        <Text style={styles.description} numberOfLines={3}>
-          {book.description}
-        </Text>
-      ) : null}
-    </View>
+      {book.description ? <Text style={styles.description}>{book.description}</Text> : null}
+    </GlassCard>
   );
 }
 
 const styles = StyleSheet.create({
-  card: {
-    padding: theme.spacing.lg,
-    borderRadius: theme.radius.md,
-    borderWidth: 1,
-    borderColor: '#e2e2e2',
-    gap: theme.spacing.xs,
+  label: {
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+    color: theme.colors.textMuted,
+    fontWeight: '700',
+    marginBottom: theme.spacing.md,
   },
-  title: { fontSize: theme.fontSize.lg, fontWeight: '600' },
-  author: { fontSize: theme.fontSize.md, color: '#444' },
-  description: { fontSize: theme.fontSize.sm, color: '#666' },
+  title: { fontSize: theme.fontSize.lg, fontWeight: '700', color: theme.colors.textPrimary, marginBottom: 3 },
+  author: { fontSize: theme.fontSize.sm, color: theme.colors.textSecondary, marginBottom: theme.spacing.sm },
+  description: { fontSize: theme.fontSize.sm, lineHeight: 21, color: theme.colors.textSecondary },
 });
