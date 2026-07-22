@@ -6,6 +6,7 @@ const ITEMS = [
   { label: 'Сегодня', path: '/today' },
   { label: 'Чат', path: '/chat' },
   { label: 'Библиотека', path: '/library' },
+  { label: 'Избранное', path: '/saved' },
 ] as const;
 
 export function AppNav({ variant }: { variant: 'sidebar' | 'bottom' }) {

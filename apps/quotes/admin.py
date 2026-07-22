@@ -1,7 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import Author, Category, Quote, QuoteOfTheDay
+from .models import Author, Category, FavoriteQuote, Quote, QuoteOfTheDay
 
 
 @admin.register(Author)
@@ -37,3 +37,10 @@ class QuoteOfTheDayAdmin(ModelAdmin):
     list_select_related = ["quote"]
     date_hierarchy = "day"
     autocomplete_fields = ["quote"]
+
+
+@admin.register(FavoriteQuote)
+class FavoriteQuoteAdmin(ModelAdmin):
+    list_display = ["user", "quote", "created_at"]
+    list_select_related = ["user", "quote"]
+    autocomplete_fields = ["user", "quote"]

@@ -2,15 +2,19 @@ import { useLocalSearchParams } from 'expo-router';
 import { Image, Linking, Pressable, StyleSheet, Text } from 'react-native';
 import { EmptyState } from '../../../../src/components/common/EmptyState';
 import { GlassCard } from '../../../../src/components/common/GlassCard';
+import { HeartButton } from '../../../../src/components/common/HeartButton';
 import { LoadingSpinner } from '../../../../src/components/common/LoadingSpinner';
 import { ScreenContainer } from '../../../../src/components/common/ScreenContainer';
 import { TiltedCard } from '../../../../src/components/common/TiltedCard';
-import { useBook } from '../../../../src/hooks/useBooks';
+import { useBook, useFavoriteBookIds, useToggleFavoriteBook } from '../../../../src/hooks/useBooks';
 import { theme } from '../../../../src/theme/theme';
 
 export default function BookDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const bookQuery = useBook(Number(id));
+  const favoriteIds = useFavoriteBookIds();
+  const toggleFavorite = useToggleFavoriteBook();
+  const isFavorited = favoriteIds.data?.book_ids.includes(Number(id)) ?? false;
 
   if (bookQuery.isLoading) {
     return (
@@ -31,7 +35,12 @@ export default function BookDetailScreen() {
 
   return (
     <ScreenContainer>
-      <GlassCard>
+      <GlassCard style={styles.card}>
+        <HeartButton
+          isFavorited={isFavorited}
+          onPress={() => toggleFavorite.mutate({ id: Number(id), isFavorited })}
+          style={styles.heart}
+        />
         {book.cover_image ? (
           <TiltedCard>
             <Image source={{ uri: book.cover_image }} style={styles.cover} />
@@ -55,6 +64,8 @@ export default function BookDetailScreen() {
 }
 
 const styles = StyleSheet.create({
+  card: { position: 'relative' },
+  heart: { position: 'absolute', top: theme.spacing.md, right: theme.spacing.md },
   cover: { width: 120, height: 180, borderRadius: theme.radius.sm, marginBottom: theme.spacing.md },
   title: { fontSize: theme.fontSize.xl, fontWeight: '700', color: theme.colors.textPrimary },
   author: { fontSize: theme.fontSize.lg, color: theme.colors.textSecondary, marginTop: 4 },

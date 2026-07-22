@@ -39,3 +39,27 @@ export async function listQuoteOfTheDayHistory(filters: ListFilters) {
   if (error) throw error;
   return data;
 }
+
+export async function favoriteQuote(id: number) {
+  const { data, error } = await client.POST('/api/v1/quotes/{id}/favorite/', { params: { path: { id } } });
+  if (error) throw error;
+  return data;
+}
+
+export async function unfavoriteQuote(id: number) {
+  const { data, error } = await client.DELETE('/api/v1/quotes/{id}/favorite/', { params: { path: { id } } });
+  if (error) throw error;
+  return data;
+}
+
+export async function listFavoriteQuoteIds() {
+  const { data, error } = await client.GET('/api/v1/favorites/quotes/ids/');
+  if (error) throw error;
+  return data;
+}
+
+export async function listFavoriteQuotes(filters: ListFilters) {
+  const { data, error } = await client.GET('/api/v1/favorites/quotes/', { params: { query: { page: filters.page } } });
+  if (error) throw error;
+  return data;
+}

@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.db import models
 
 from apps.core.models import TimestampedModel
@@ -29,3 +30,15 @@ class FeaturedBook(TimestampedModel):
 
     def __str__(self):
         return f"{self.week_start}: {self.book.title}"
+
+
+class FavoriteBook(TimestampedModel):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="favorite_books")
+    book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="favorited_by")
+
+    class Meta:
+        unique_together = ["user", "book"]
+        ordering = ["-created_at"]
+
+    def __str__(self):
+        return f"{self.user} ♥ {self.book.title}"

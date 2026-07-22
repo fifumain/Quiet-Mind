@@ -27,3 +27,27 @@ export async function listFeaturedBookHistory(filters: ListFilters) {
   if (error) throw error;
   return data;
 }
+
+export async function favoriteBook(id: number) {
+  const { data, error } = await client.POST('/api/v1/books/{id}/favorite/', { params: { path: { id } } });
+  if (error) throw error;
+  return data;
+}
+
+export async function unfavoriteBook(id: number) {
+  const { data, error } = await client.DELETE('/api/v1/books/{id}/favorite/', { params: { path: { id } } });
+  if (error) throw error;
+  return data;
+}
+
+export async function listFavoriteBookIds() {
+  const { data, error } = await client.GET('/api/v1/favorites/books/ids/');
+  if (error) throw error;
+  return data;
+}
+
+export async function listFavoriteBooks(filters: ListFilters) {
+  const { data, error } = await client.GET('/api/v1/favorites/books/', { params: { query: { page: filters.page } } });
+  if (error) throw error;
+  return data;
+}

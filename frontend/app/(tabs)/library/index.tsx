@@ -9,8 +9,8 @@ import { LoadingSpinner } from '../../../src/components/common/LoadingSpinner';
 import { ScreenContainer } from '../../../src/components/common/ScreenContainer';
 import { FilterBar } from '../../../src/components/library/FilterBar';
 import { ListItem } from '../../../src/components/library/ListItem';
-import { useBooks } from '../../../src/hooks/useBooks';
-import { useCategories, useQuotes } from '../../../src/hooks/useQuotes';
+import { useBooks, useFavoriteBookIds, useToggleFavoriteBook } from '../../../src/hooks/useBooks';
+import { useCategories, useFavoriteQuoteIds, useQuotes, useToggleFavoriteQuote } from '../../../src/hooks/useQuotes';
 import { glassBlur, theme } from '../../../src/theme/theme';
 
 type Segment = 'quotes' | 'books';
@@ -43,6 +43,13 @@ export default function LibraryScreen() {
   const bookItems = booksQuery.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
 
   const total = activeQuery.data?.pages[0]?.count ?? 0;
+
+  const favoriteQuoteIds = useFavoriteQuoteIds();
+  const favoriteBookIds = useFavoriteBookIds();
+  const favoriteQuoteIdSet = useMemo(() => new Set(favoriteQuoteIds.data?.quote_ids ?? []), [favoriteQuoteIds.data]);
+  const favoriteBookIdSet = useMemo(() => new Set(favoriteBookIds.data?.book_ids ?? []), [favoriteBookIds.data]);
+  const toggleFavoriteQuote = useToggleFavoriteQuote();
+  const toggleFavoriteBook = useToggleFavoriteBook();
 
   const header = (
     <View style={styles.header}>
@@ -106,6 +113,10 @@ export default function LibraryScreen() {
                 title={`"${item.text}"`}
                 subtitle={item.author.name}
                 onPress={() => router.navigate(`/library/quotes/${item.id}`)}
+                isFavorited={favoriteQuoteIdSet.has(item.id)}
+                onToggleFavorite={() =>
+                  toggleFavoriteQuote.mutate({ id: item.id, isFavorited: favoriteQuoteIdSet.has(item.id) })
+                }
               />
             </AnimatedEntrance>
           )}
@@ -128,6 +139,10 @@ export default function LibraryScreen() {
                 title={item.title}
                 subtitle={item.author.name}
                 onPress={() => router.navigate(`/library/books/${item.id}`)}
+                isFavorited={favoriteBookIdSet.has(item.id)}
+                onToggleFavorite={() =>
+                  toggleFavoriteBook.mutate({ id: item.id, isFavorited: favoriteBookIdSet.has(item.id) })
+                }
               />
             </AnimatedEntrance>
           )}

@@ -1,4 +1,5 @@
 import { Pressable, StyleSheet, Text } from 'react-native';
+import { HeartButton } from '../common/HeartButton';
 import { ShapeBlurCard } from '../common/ShapeBlurCard';
 import { glassBlur, theme } from '../../theme/theme';
 
@@ -6,9 +7,11 @@ interface ListItemProps {
   title: string;
   subtitle: string;
   onPress: () => void;
+  isFavorited?: boolean;
+  onToggleFavorite?: () => void;
 }
 
-export function ListItem({ title, subtitle, onPress }: ListItemProps) {
+export function ListItem({ title, subtitle, onPress, isFavorited, onToggleFavorite }: ListItemProps) {
   return (
     <ShapeBlurCard style={[styles.container, glassBlur(16)]}>
       <Pressable style={styles.pressable} onPress={onPress}>
@@ -17,6 +20,11 @@ export function ListItem({ title, subtitle, onPress }: ListItemProps) {
         </Text>
         <Text style={styles.subtitle}>{subtitle}</Text>
       </Pressable>
+      {onToggleFavorite ? (
+        // Sibling to the navigation Pressable above, not nested inside it —
+        // keeps the heart tap from also triggering navigation.
+        <HeartButton isFavorited={!!isFavorited} onPress={onToggleFavorite} style={styles.heart} />
+      ) : null}
     </ShapeBlurCard>
   );
 }
@@ -35,6 +43,7 @@ const styles = StyleSheet.create({
     gap: theme.spacing.md,
     justifyContent: 'space-between',
   },
+  heart: { position: 'absolute', top: theme.spacing.sm, right: theme.spacing.sm },
   title: { fontSize: theme.fontSize.sm, lineHeight: 23, fontWeight: '600', color: theme.colors.textPrimary },
   subtitle: { fontSize: theme.fontSize.xs, color: theme.colors.textSecondary },
 });

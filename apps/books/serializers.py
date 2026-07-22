@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from apps.quotes.serializers import AuthorSerializer, CategorySerializer
 
-from .models import Book, FeaturedBook
+from .models import Book, FavoriteBook, FeaturedBook
 
 
 class BookSerializer(serializers.ModelSerializer):
@@ -23,3 +23,11 @@ class FeaturedBookSerializer(serializers.ModelSerializer):
     class Meta:
         model = FeaturedBook
         fields = ["week_start", "book"]
+
+
+class FavoriteBookSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+
+    class Meta:
+        model = FavoriteBook
+        fields = ["id", "book", "created_at"]

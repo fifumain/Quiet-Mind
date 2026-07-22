@@ -1,7 +1,7 @@
 from django.contrib import admin
 from unfold.admin import ModelAdmin
 
-from .models import Book, FeaturedBook
+from .models import Book, FavoriteBook, FeaturedBook
 
 
 @admin.register(Book)
@@ -20,3 +20,10 @@ class FeaturedBookAdmin(ModelAdmin):
     list_select_related = ["book"]
     date_hierarchy = "week_start"
     autocomplete_fields = ["book"]
+
+
+@admin.register(FavoriteBook)
+class FavoriteBookAdmin(ModelAdmin):
+    list_display = ["user", "book", "created_at"]
+    list_select_related = ["user", "book"]
+    autocomplete_fields = ["user", "book"]

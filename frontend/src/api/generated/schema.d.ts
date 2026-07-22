@@ -160,6 +160,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/books/{id}/favorite/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        post: operations["v1_books_favorite_create"];
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        delete: operations["v1_books_favorite_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/categories/": {
         parameters: {
             query?: never;
@@ -243,6 +267,70 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["v1_chat_session_reset_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/favorites/books/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_favorites_books_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/favorites/books/ids/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_favorites_books_ids_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/favorites/quotes/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_favorites_quotes_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/favorites/quotes/ids/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_favorites_quotes_ids_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -384,6 +472,30 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/quotes/{id}/favorite/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        post: operations["v1_quotes_favorite_create"];
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        delete: operations["v1_quotes_favorite_destroy"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -422,6 +534,30 @@ export interface components {
             readonly created_at: string;
             /** Format: date-time */
             readonly updated_at: string;
+        };
+        FavoriteBook: {
+            readonly id: number;
+            readonly book: components["schemas"]["Book"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        FavoriteBookIds: {
+            book_ids: number[];
+        };
+        FavoriteBookToggle: {
+            is_favorited: boolean;
+        };
+        FavoriteQuote: {
+            readonly id: number;
+            readonly quote: components["schemas"]["Quote"];
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        FavoriteQuoteIds: {
+            quote_ids: number[];
+        };
+        FavoriteQuoteToggle: {
+            is_favorited: boolean;
         };
         FeaturedBook: {
             /** Format: date */
@@ -487,6 +623,36 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ChatMessage"][];
+        };
+        PaginatedFavoriteBookList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["FavoriteBook"][];
+        };
+        PaginatedFavoriteQuoteList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["FavoriteQuote"][];
         };
         PaginatedFeaturedBookList: {
             /** @example 123 */
@@ -773,6 +939,50 @@ export interface operations {
             };
         };
     };
+    v1_books_favorite_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this book. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteBookToggle"];
+                };
+            };
+        };
+    };
+    v1_books_favorite_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this book. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteBookToggle"];
+                };
+            };
+        };
+    };
     v1_categories_list: {
         parameters: {
             query?: {
@@ -898,6 +1108,88 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    v1_favorites_books_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFavoriteBookList"];
+                };
+            };
+        };
+    };
+    v1_favorites_books_ids_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteBookIds"];
+                };
+            };
+        };
+    };
+    v1_favorites_quotes_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedFavoriteQuoteList"];
+                };
+            };
+        };
+    };
+    v1_favorites_quotes_ids_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteQuoteIds"];
+                };
             };
         };
     };
@@ -1071,6 +1363,50 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Quote"];
+                };
+            };
+        };
+    };
+    v1_quotes_favorite_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this quote. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteQuoteToggle"];
+                };
+            };
+        };
+    };
+    v1_quotes_favorite_destroy: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description A unique integer value identifying this quote. */
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FavoriteQuoteToggle"];
                 };
             };
         };
