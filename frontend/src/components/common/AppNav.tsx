@@ -6,6 +6,7 @@ const ITEMS = [
   { label: 'Сегодня', path: '/today' },
   { label: 'Чат', path: '/chat' },
   { label: 'Библиотека', path: '/library' },
+  { label: 'Курсы', path: '/courses' },
   { label: 'Избранное', path: '/saved' },
 ] as const;
 

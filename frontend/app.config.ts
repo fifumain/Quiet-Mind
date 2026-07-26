@@ -9,6 +9,7 @@ export default ({ config }: ConfigContext): ExpoConfig => ({
   icon: './assets/icon.png',
   userInterfaceStyle: 'light',
   scheme: 'psychologyapp',
+  plugins: ['expo-font', 'expo-image'],
   experiments: {
     typedRoutes: true,
   },

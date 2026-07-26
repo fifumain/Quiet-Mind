@@ -30,6 +30,24 @@ export const theme = {
   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },
   fontSize: { xs: 13, sm: 15, md: 17, lg: 22, xl: 28 },
   radius: { sm: 10, md: 16, lg: 20, pill: 999 },
+
+  // "Wellness Calm" pairing (Lora serif for headings, Raleway sans for body),
+  // loaded in app/_layout.tsx. Family names match @expo-google-fonts exports.
+  fonts: {
+    display: 'Lora_600SemiBold',
+    displayMedium: 'Lora_500Medium',
+    body: 'Raleway_400Regular',
+    bodyMedium: 'Raleway_500Medium',
+    bodySemibold: 'Raleway_600SemiBold',
+    bodyBold: 'Raleway_700Bold',
+  },
+
+  // Soft layered depth on top of the glass (adopted from ui-ux-pro-max
+  // "Soft UI Evolution" — softer than flat, no neumorphism). Web-only shadow.
+  shadow: {
+    card: { boxShadow: '0 12px 30px -14px rgba(0,0,0,0.55)' },
+    cardHover: { boxShadow: '0 20px 46px -16px rgba(0,0,0,0.62)' },
+  },
 };
 
 /**

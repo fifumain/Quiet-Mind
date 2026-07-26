@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     "apps.accounts",
     "apps.quotes",
     "apps.books",
+    "apps.courses",
     "apps.chat",
 ]
 

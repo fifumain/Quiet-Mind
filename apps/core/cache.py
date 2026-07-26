@@ -3,7 +3,7 @@ from django.core.cache import cache
 from rest_framework.response import Response
 
 LIST_CACHE_PREFIX = "listcache"
-LIST_CACHE_MODEL_NAMES = ("quote", "author", "category", "book")
+LIST_CACHE_MODEL_NAMES = ("quote", "author", "category", "book", "course")
 
 
 def _list_cache_key(model_name, request):

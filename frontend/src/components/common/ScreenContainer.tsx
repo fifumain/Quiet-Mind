@@ -40,8 +40,8 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.textPrimary,
+    fontFamily: theme.fonts.display,
     fontSize: theme.fontSize.xl,
-    fontWeight: '700',
     marginBottom: theme.spacing.xs,
   },
 });

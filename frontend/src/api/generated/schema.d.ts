@@ -272,6 +272,94 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/courses/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        get: operations["v1_courses_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{slug}/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * @description Caches the serialized list() response keyed by the full request path
+         *     (including query string) — filters/search/pagination each get their own entry.
+         */
+        get: operations["v1_courses_retrieve"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{slug}/enroll/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_courses_enroll_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/{slug}/stages/{stage_number}/complete/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["v1_courses_stages_complete_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/courses/my-progress/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_courses_my_progress_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/favorites/books/": {
         parameters: {
             query?: never;
@@ -535,6 +623,45 @@ export interface components {
             /** Format: date-time */
             readonly updated_at: string;
         };
+        CourseDetail: {
+            readonly id: number;
+            title: string;
+            slug: string;
+            teaser?: string;
+            /** Format: uri */
+            cover_image?: string;
+            readonly categories: components["schemas"]["Category"][];
+            readonly stage_count: number;
+            readonly completions_count: number;
+            description?: string;
+            readonly stages: components["schemas"]["CourseStage"][];
+        };
+        CourseEnrollment: {
+            readonly course: components["schemas"]["CourseList"];
+            current_stage?: number;
+            /** Format: date-time */
+            completed_at?: string | null;
+            readonly completed_stage_numbers: number[];
+        };
+        CourseList: {
+            readonly id: number;
+            title: string;
+            slug: string;
+            teaser?: string;
+            /** Format: uri */
+            cover_image?: string;
+            readonly categories: components["schemas"]["Category"][];
+            readonly stage_count: number;
+            readonly completions_count: number;
+        };
+        CourseStage: {
+            stage_number: number;
+            title: string;
+            body: string;
+            reflection_prompt?: string;
+            readonly quote: components["schemas"]["Quote"];
+            readonly book: components["schemas"]["Book"];
+        };
         FavoriteBook: {
             readonly id: number;
             readonly book: components["schemas"]["Book"];
@@ -623,6 +750,36 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["ChatMessage"][];
+        };
+        PaginatedCourseEnrollmentList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CourseEnrollment"][];
+        };
+        PaginatedCourseListList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["CourseList"][];
         };
         PaginatedFavoriteBookList: {
             /** @example 123 */
@@ -1108,6 +1265,114 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    v1_courses_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCourseListList"];
+                };
+            };
+        };
+    };
+    v1_courses_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseDetail"];
+                };
+            };
+        };
+    };
+    v1_courses_enroll_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseEnrollment"];
+                };
+            };
+        };
+    };
+    v1_courses_stages_complete_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+                stage_number: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CourseEnrollment"];
+                };
+            };
+        };
+    };
+    v1_courses_my_progress_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedCourseEnrollmentList"];
+                };
             };
         };
     };
