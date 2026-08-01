@@ -1,5 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
-import { StyleSheet, Text } from 'react-native';
+import { StyleSheet } from 'react-native';
+import { Text } from '../../../../src/components/common/AppText';
 import { EmptyState } from '../../../../src/components/common/EmptyState';
 import { GlassCard } from '../../../../src/components/common/GlassCard';
 import { HeartButton } from '../../../../src/components/common/HeartButton';
@@ -25,7 +26,7 @@ export default function QuoteDetailScreen() {
   if (!quoteQuery.data) {
     return (
       <ScreenContainer>
-        <EmptyState message="Цитата не найдена." />
+        <EmptyState message="Quote not found." />
       </ScreenContainer>
     );
   }

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, View } from 'react-native';
+import { Text } from '../../../../src/components/common/AppText';
 import { CountUp } from '../../../../src/components/common/CountUp';
 import { EmptyState } from '../../../../src/components/common/EmptyState';
 import { LoadingSpinner } from '../../../../src/components/common/LoadingSpinner';
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
   },
   segmentButton: { paddingHorizontal: theme.spacing.md, paddingVertical: 6, borderRadius: theme.radius.sm },
-  segmentButtonActive: { backgroundColor: theme.glass.fillStrong },
+  segmentButtonActive: { backgroundColor: theme.glass.selected },
   segmentText: { fontSize: theme.fontSize.sm, fontWeight: '600', color: theme.colors.textMuted },
   segmentTextActive: { color: theme.colors.textPrimary },
   total: { fontSize: theme.fontSize.xs, color: theme.colors.textMuted },

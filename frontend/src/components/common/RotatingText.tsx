@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import { Text, type TextStyle } from 'react-native';
+import { type TextStyle } from 'react-native';
+import { Text } from './AppText';
 import Animated, { FadeIn, FadeOut } from 'react-native-reanimated';
 
 interface RotatingTextProps {

@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../../../src/components/common/AppText';
 import { EmptyState } from '../../../src/components/common/EmptyState';
 import { LoadingSpinner } from '../../../src/components/common/LoadingSpinner';
 import { ScreenContainer } from '../../../src/components/common/ScreenContainer';
@@ -20,7 +21,13 @@ export default function CoursesScreen() {
   const [progress, setProgress] = useState<ProgressFilter>('all');
   const [hideDone, setHideDone] = useState(true);
 
-  const courses = coursesQuery.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
+  // Memoised so `visible` below can actually hit its cache — a fresh flatMap()
+  // every render would change identity and defeat it.
+  const coursesData = coursesQuery.data;
+  const courses = useMemo(
+    () => coursesData?.pages.flatMap((page) => page?.results ?? []) ?? [],
+    [coursesData],
+  );
 
   const visible = useMemo(() => {
     const stateOf = (id: number) => progressById.get(id)?.state ?? 'new';
@@ -34,16 +41,16 @@ export default function CoursesScreen() {
   }, [courses, progressById, sort, progress, hideDone]);
 
   return (
-    <ScreenContainer title="Курсы">
+    <ScreenContainer title="Courses">
       <Text style={styles.lede}>
-        Небольшие курсы по психологии. Нажмите карточку — раскроется описание и программа, а кнопка внутри
-        откроет сам курс.
+        Short psychology courses. Tap a card to open its description and syllabus; the button inside
+        takes you into the course itself.
       </Text>
 
       <View style={styles.toolbar}>
         <View style={[styles.seg, glassBlur()]}>
-          <SegButton label="Рекомендуемые" active={sort === 'rec'} onPress={() => setSort('rec')} />
-          <SegButton label="Популярные" active={sort === 'pop'} onPress={() => setSort('pop')} />
+          <SegButton label="Recommended" active={sort === 'rec'} onPress={() => setSort('rec')} />
+          <SegButton label="Popular" active={sort === 'pop'} onPress={() => setSort('pop')} />
         </View>
         <Pressable
           onPress={() => setHideDone((v) => !v)}
@@ -54,17 +61,17 @@ export default function CoursesScreen() {
           <View style={[styles.track, hideDone && styles.trackOn]}>
             <View style={[styles.knob, hideDone && styles.knobOn]} />
           </View>
-          <Text style={styles.switchLabel}>Скрыть пройденные</Text>
+          <Text style={styles.switchLabel}>Hide completed</Text>
         </Pressable>
       </View>
 
       <View style={styles.chips}>
         {(
           [
-            ['all', 'Все'],
-            ['new', 'Не начатые'],
-            ['progress', 'В процессе'],
-            ['done', 'Пройденные'],
+            ['all', 'All'],
+            ['new', 'Not started'],
+            ['progress', 'In progress'],
+            ['done', 'Completed'],
           ] as [ProgressFilter, string][]
         ).map(([value, label]) => (
           <Chip key={value} label={label} active={progress === value} onPress={() => setProgress(value)} />
@@ -74,7 +81,7 @@ export default function CoursesScreen() {
       {coursesQuery.isLoading ? (
         <LoadingSpinner />
       ) : visible.length === 0 ? (
-        <EmptyState message="Ничего не найдено — попробуйте другой фильтр." />
+        <EmptyState message="Nothing found — try another filter." />
       ) : (
         <View style={styles.gridWrap}>
           <CourseExpandableGrid
@@ -117,7 +124,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
   },
   segButton: { paddingHorizontal: theme.spacing.md, paddingVertical: 6, borderRadius: theme.radius.sm },
-  segButtonActive: { backgroundColor: theme.glass.fillStrong },
+  segButtonActive: { backgroundColor: theme.glass.selected },
   segText: { fontFamily: theme.fonts.bodySemibold, fontSize: theme.fontSize.sm, color: theme.colors.textMuted },
   segTextActive: { color: theme.colors.textPrimary },
   switchRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginLeft: 'auto' },
@@ -128,7 +135,7 @@ const styles = StyleSheet.create({
   switchLabel: { fontFamily: theme.fonts.bodySemibold, fontSize: theme.fontSize.sm, color: theme.colors.textSecondary },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, marginBottom: theme.spacing.lg },
   chip: { paddingHorizontal: 13, paddingVertical: 7, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.glass.border },
-  chipActive: { backgroundColor: theme.glass.fillStrong, borderColor: 'transparent' },
+  chipActive: { backgroundColor: theme.glass.selected, borderColor: theme.glass.selectedBorder },
   chipText: { fontFamily: theme.fonts.bodySemibold, fontSize: theme.fontSize.xs, color: theme.colors.textMuted },
   chipTextActive: { color: theme.colors.textPrimary },
   gridWrap: { width: '100%' },

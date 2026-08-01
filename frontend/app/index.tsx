@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router';
 import type { ReactNode } from 'react';
 import { useState } from 'react';
-import { Platform, Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View, type ViewStyle } from 'react-native';
+import { Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View, type ViewStyle } from 'react-native';
+import { Text } from '../src/components/common/AppText';
 import { AnimatedText } from '../src/components/landing/AnimatedText';
 import { CardSwap } from '../src/components/landing/CardSwap';
 import { GradientText } from '../src/components/landing/GradientText';
@@ -11,58 +12,86 @@ import { ScrollReveal } from '../src/components/landing/ScrollReveal';
 import { ShinyText } from '../src/components/landing/ShinyText';
 import { TopBar } from '../src/components/landing/TopBar';
 import { ClickSpark } from '../src/components/common/ClickSpark';
-import { CountUp } from '../src/components/common/CountUp';
 import { GlassBackground } from '../src/components/common/GlassBackground';
 import { GlassCard } from '../src/components/common/GlassCard';
-import { RotatingText } from '../src/components/common/RotatingText';
 import { SpecularButton } from '../src/components/common/SpecularButton';
 import { useAuthStore } from '../src/store/authStore';
 import { theme } from '../src/theme/theme';
 
-const HERO_PHRASES = [
-  'Listens when you need to be heard.',
-  'Asks questions — never diagnoses.',
-  'Points you to a book, an author, an idea.',
-  'Always here, without judgment.',
-];
-
 const FEATURES = [
   {
     title: 'Conversation, not advice',
-    body: 'Alex listens and asks guiding questions. No diagnoses, no ready-made fixes — just space to think out loud.',
+    body: 'Alex listens and asks guiding questions. No diagnoses, no ready-made fixes — just room to think out loud.',
   },
   {
     title: 'Ideas from psychology',
-    body: 'When it fits, your companion brings up relevant concepts, books and quotes — from Stoicism to attachment theory.',
+    body: 'When it fits, Alex brings up a relevant concept, book or quote — from Stoicism to attachment theory.',
   },
   {
     title: 'A library at hand',
-    body: 'A curated collection of psychology quotes and books — searchable and filterable by topic, always one tap away.',
+    body: 'A hand-picked collection of psychology quotes and books — searchable and filterable by topic, always one tap away.',
   },
   {
-    title: 'Gentle with you',
-    body: 'A calm tone, privacy, and soft care for how you feel — if the conversation needs a pause, Alex senses it.',
+    title: 'Courses, step by step',
+    body: 'Short courses on specific themes — confidence, resilience, boundaries. Taken one stage at a time, at your own pace.',
+  },
+];
+
+const HOW_IT_WORKS = [
+  {
+    step: '01',
+    title: "You write what is on your mind",
+    body: 'In your own words — no form, no questionnaire. Start from a suggested opener if the first sentence is hard.',
+  },
+  {
+    step: '02',
+    title: 'Alex asks questions',
+    body: 'No diagnoses, no instructions. It helps you lay the situation out and hear yourself.',
+  },
+  {
+    step: '03',
+    title: 'It gives you something to sit with',
+    body: 'Where it fits, Alex recalls a book, an author or an idea from psychology. Save it and come back later.',
+  },
+];
+
+const FAQ = [
+  {
+    q: 'Is this therapy?',
+    a: 'No. Alex is a companion, not a therapist, and it does not replace working with a professional. It gives no diagnoses and no personal recommendations about your situation.',
+  },
+  {
+    q: 'Who reads my messages?',
+    a: 'Your conversation is tied to your account and visible only to you. The text is sent to a language model to generate a reply. You can delete the whole thread at any time with "Clear conversation".',
+  },
+  {
+    q: 'What does it cost?',
+    a: "It is free right now — this is a learning project, not a commercial product. If paid features ever appear, free access to quotes, books and basic conversation stays.",
+  },
+  {
+    q: "What if I am in a really bad place?",
+    a: 'Alex detects mentions of self-harm and, in that case, stops the ordinary conversation and points you to a professional or a helpline. It is not a substitute for emergency help.',
   },
 ];
 
 const SCREENS = [
   {
     kind: 'today' as const,
-    caption: 'Today — quote of the day & featured book',
-    heading: 'Start your day grounded',
-    body: 'A quote and a featured book waiting for you each morning — a small nudge before the day gets loud.',
+    caption: 'Today — quote of the day and book of the week',
+    heading: 'Start the day with something to stand on',
+    body: 'A quote and a book wait for you each morning — a small reason to pause before the day gets loud.',
   },
   {
     kind: 'chat' as const,
-    caption: 'Chat — talk with Alex',
+    caption: 'Chat — talking with Alex',
     heading: 'Talk it through with Alex',
-    body: 'Guiding questions, not advice. Alex listens, reflects, and brings up an idea only when it truly fits.',
+    body: 'Guiding questions instead of advice. Alex listens, reflects, and brings up an idea only when it genuinely fits.',
   },
   {
     kind: 'library' as const,
-    caption: 'Library — quotes & books',
-    heading: 'A library at your side',
-    body: 'Quotes and books from psychology, organized by topic — searchable whenever a conversation needs one.',
+    caption: 'Library — quotes and books',
+    heading: 'The library, close at hand',
+    body: 'Psychology quotes and books sorted by topic — find the right one when a conversation leads there.',
   },
 ];
 
@@ -77,12 +106,6 @@ const TOPICS = [
   'Self-Knowledge',
 ];
 
-const STATS = [
-  { value: 33, label: 'quotes' },
-  { value: 17, label: 'books' },
-  { value: 8, label: 'topics' },
-  { value: 16, label: 'authors' },
-];
 
 export default function LandingScreen() {
   const router = useRouter();
@@ -118,15 +141,20 @@ export default function LandingScreen() {
         {/* ---- Hero ---- */}
         <View style={styles.hero}>
           <ShinyText style={styles.eyebrow}>AN AI COMPANION FOR PSYCHOLOGY</ShinyText>
-          <AnimatedText text="A space where you are" style={styles.heroLine} />
-          <GradientText style={styles.heroLine}>truly heard</GradientText>
-          <View style={styles.rotatingWrap}>
-            <RotatingText phrases={HERO_PHRASES} style={styles.rotating} />
-          </View>
+          <AnimatedText text="A place where you are" style={styles.heroLine} />
+          <GradientText style={styles.heroLine}>actually listened to</GradientText>
+          {/* Static, and specific: a rotating line meant the visitor never saw
+              the whole proposition at once — only one fragment of four. */}
+          <Text style={styles.heroSub}>
+            Tell Alex what is on your mind. It listens, asks guiding questions, and points you to a
+            book or an idea from psychology — no diagnoses, no instructions on what to do.
+          </Text>
           <View style={styles.heroActions}>
             <ClickSpark onPress={primaryCta}>
               <SpecularButton style={styles.ctaPrimary} onPress={primaryCta}>
-                <Text style={styles.ctaPrimaryText}>{accessToken ? 'Open the app' : 'Start free'}</Text>
+                <Text style={styles.ctaPrimaryText}>
+                  {accessToken ? 'Open the app' : 'Start free'}
+                </Text>
               </SpecularButton>
             </ClickSpark>
             {!accessToken ? (
@@ -135,6 +163,9 @@ export default function LandingScreen() {
               </Pressable>
             ) : null}
           </View>
+          <Text style={styles.heroDisclaimer}>
+            Alex is a companion, not a therapist, and does not replace working with a professional.
+          </Text>
         </View>
 
         {/* ---- Topics marquee ---- */}
@@ -143,7 +174,7 @@ export default function LandingScreen() {
         </View>
 
         {/* ---- Features ---- */}
-        <Section id="features" title="What Alex does" subtitle="A companion, not a therapist — and that is its strength.">
+        <Section id="features" title="What Alex does" subtitle="A companion, not a therapist — and that is the point.">
           <View style={[styles.featureGrid, isWide && styles.featureGridWide]}>
             {FEATURES.map((f, i) => (
               <ScrollReveal key={f.title} delay={i * 90} style={isWide ? styles.featureCellWide : styles.featureCell}>
@@ -194,17 +225,22 @@ export default function LandingScreen() {
             </View>
           </View>
 
-          {/* ---- Stats, in a glass bubble the card stack visually clips into ---- */}
+          {/*
+            The glass bubble the card stack visually clips into. It used to hold
+            four counters (33 quotes / 17 books / 8 topics / 16 authors) animating
+            up in 40px gold — seed-data counts dressed as traction, which mostly
+            told a visitor the database is empty. Same bubble, but now it answers
+            the question the page never did: what actually happens here.
+          */}
           <ScrollReveal>
             <View style={[styles.statsBubbleWrap, { marginTop: bubbleGap }]}>
               <GlassCard strong style={styles.statsBubble}>
-                <View style={styles.statsRow}>
-                  {STATS.map((s) => (
-                    <View key={s.label} style={styles.statCell}>
-                      <View style={styles.statValueRow}>
-                        <CountUp target={s.value} style={styles.statValue} />
-                      </View>
-                      <Text style={styles.statLabel}>{s.label}</Text>
+                <View style={[styles.stepsRow, !isWide && styles.stepsColumn]}>
+                  {HOW_IT_WORKS.map((s) => (
+                    <View key={s.step} style={styles.stepCell}>
+                      <Text style={styles.stepNum}>{s.step}</Text>
+                      <Text style={styles.stepTitle}>{s.title}</Text>
+                      <Text style={styles.stepBody}>{s.body}</Text>
                     </View>
                   ))}
                 </View>
@@ -214,7 +250,7 @@ export default function LandingScreen() {
         </Section>
 
         {/* ---- Topics grid ---- */}
-        <Section id="topics" title="Topics you can talk about" subtitle="From everyday anxiety to the big questions of meaning.">
+        <Section id="topics" title="What you can talk about" subtitle="From everyday anxiety to the big questions about meaning.">
           <View style={styles.topicsWrap}>
             {TOPICS.map((t) => (
               <View key={t} style={styles.topicChip}>
@@ -224,16 +260,63 @@ export default function LandingScreen() {
           </View>
         </Section>
 
+        {/* ---- Privacy & boundaries: the objection the page never answered ---- */}
+        <Section
+          id="privacy"
+          title="Privacy and boundaries"
+          subtitle="What Alex does, what it doesn't, and what happens to your words."
+        >
+          <View style={[styles.boundaryGrid, isWide && styles.boundaryGridWide]}>
+            {[
+              {
+                title: 'No diagnoses',
+                body: 'Alex gives no diagnoses and no instructions about your particular situation. It talks about general ideas from psychology.',
+              },
+              {
+                title: 'The conversation is yours',
+                body: 'Your thread is tied to your account and visible only to you. Delete all of it in one tap.',
+              },
+              {
+                title: 'In a crisis, to people',
+                body: 'If a message signals a threat to yourself, Alex stops the ordinary conversation and points you to a professional.',
+              },
+            ].map((b, i) => (
+              <ScrollReveal key={b.title} delay={i * 90} style={isWide ? styles.boundaryCellWide : styles.featureCell}>
+                <GlassCard style={styles.boundaryCard}>
+                  <Text style={styles.featureTitle}>{b.title}</Text>
+                  <Text style={styles.featureBody}>{b.body}</Text>
+                </GlassCard>
+              </ScrollReveal>
+            ))}
+          </View>
+        </Section>
+
+        {/* ---- FAQ ---- */}
+        <Section id="faq" title="Common questions" subtitle="Briefly, the things people ask before signing up.">
+          <View style={styles.faqWrap}>
+            {FAQ.map((item, i) => (
+              <ScrollReveal key={item.q} delay={i * 70}>
+                <View style={styles.faqItem}>
+                  <Text style={styles.faqQ}>{item.q}</Text>
+                  <Text style={styles.faqA}>{item.a}</Text>
+                </View>
+              </ScrollReveal>
+            ))}
+          </View>
+        </Section>
+
         {/* ---- Final CTA ---- */}
         <ScrollReveal>
           <GlassCard strong style={styles.finalCta}>
             <GradientText style={styles.finalTitle}>Start the conversation today</GradientText>
             <Text style={styles.finalBody}>
-              Free, without judgment, at your own pace. Alex is ready to listen.
+              Free, without judgement, at your own pace. Alex is ready to listen.
             </Text>
             <ClickSpark onPress={primaryCta}>
               <SpecularButton style={styles.ctaPrimary} onPress={primaryCta}>
-                <Text style={styles.ctaPrimaryText}>{accessToken ? 'Open the app' : 'Create account'}</Text>
+                <Text style={styles.ctaPrimaryText}>
+                  {accessToken ? 'Open the app' : 'Create account'}
+                </Text>
               </SpecularButton>
             </ClickSpark>
           </GlassCard>
@@ -243,7 +326,11 @@ export default function LandingScreen() {
         <View style={styles.footer}>
           <Text style={styles.footerBrand}>Alex</Text>
           <Text style={styles.footerNote}>
-            This is a companion, not a substitute for professional help. In a crisis, please reach out to a specialist.
+            Alex is a companion, not a replacement for professional help. In a crisis, please reach
+            out to a professional or a mental-health helpline.
+          </Text>
+          <Text style={styles.footerMeta}>
+            A learning project. Quotes and books belong to their respective authors and rights holders.
           </Text>
         </View>
       </ScrollView>
@@ -272,8 +359,21 @@ const styles = StyleSheet.create({
   hero: { ...contentWidth, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl * 2, paddingBottom: theme.spacing.xl, alignItems: 'center', gap: theme.spacing.md },
   eyebrow: { fontSize: theme.fontSize.sm, fontWeight: '700', letterSpacing: 1.5 },
   heroLine: { fontSize: 44, lineHeight: 52, fontWeight: '700', color: theme.colors.textPrimary, textAlign: 'center' },
-  rotatingWrap: { height: 30, marginTop: theme.spacing.sm },
-  rotating: { fontSize: theme.fontSize.lg, color: theme.colors.textSecondary, textAlign: 'center' },
+  heroSub: {
+    fontSize: theme.fontSize.md,
+    lineHeight: 27,
+    color: theme.colors.textSecondary,
+    textAlign: 'center',
+    maxWidth: 620,
+    marginTop: theme.spacing.md,
+  },
+  heroDisclaimer: {
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.textMuted,
+    textAlign: 'center',
+    marginTop: theme.spacing.md,
+    maxWidth: 520,
+  },
   heroActions: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.md, marginTop: theme.spacing.lg, alignItems: 'center', justifyContent: 'center' },
   ctaPrimary: { backgroundColor: theme.colors.accent, borderRadius: theme.radius.md, paddingVertical: 14, paddingHorizontal: theme.spacing.xl, alignItems: 'center' },
   ctaPrimaryText: { color: theme.gradient[0], fontSize: theme.fontSize.md, fontWeight: '700' },
@@ -307,11 +407,41 @@ const styles = StyleSheet.create({
 
   statsBubbleWrap: { ...contentWidth, paddingHorizontal: theme.spacing.lg, zIndex: 1 },
   statsBubble: { borderRadius: theme.radius.pill, paddingVertical: theme.spacing.lg },
-  statsRow: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: theme.spacing.xl },
-  statCell: { alignItems: 'center', minWidth: 90 },
-  statValueRow: { flexDirection: 'row' },
-  statValue: { fontSize: 40, fontWeight: '700', color: theme.colors.accent },
-  statLabel: { fontSize: theme.fontSize.sm, color: theme.colors.textSecondary, marginTop: 2 },
+  stepsRow: { flexDirection: 'row', gap: theme.spacing.xl },
+  stepsColumn: { flexDirection: 'column', gap: theme.spacing.lg },
+  stepCell: { flex: 1, gap: 6 },
+  stepNum: {
+    fontFamily: theme.fonts.bodyBold,
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 1.5,
+    color: theme.colors.accent,
+  },
+  stepTitle: { fontFamily: theme.fonts.display, fontSize: theme.fontSize.md, color: theme.colors.textPrimary },
+  stepBody: { fontSize: theme.fontSize.sm, lineHeight: 21, color: theme.colors.textSecondary },
+  boundaryGrid: { gap: theme.spacing.md },
+  // Three across on wide screens — reusing the 4-up feature cell (48%) here
+  // left a half-empty second row.
+  boundaryGridWide: { flexDirection: 'row', flexWrap: 'nowrap' },
+  boundaryCellWide: { flex: 1 },
+  boundaryCard: { gap: theme.spacing.sm, minHeight: 150, height: '100%' },
+  faqWrap: { gap: theme.spacing.md, maxWidth: 760, width: '100%', alignSelf: 'center' },
+  faqItem: {
+    padding: theme.spacing.lg,
+    borderRadius: theme.radius.md,
+    backgroundColor: theme.glass.fillSubtle,
+    borderWidth: 1,
+    borderColor: theme.glass.border,
+    gap: 6,
+  },
+  faqQ: { fontFamily: theme.fonts.display, fontSize: theme.fontSize.md, color: theme.colors.textPrimary },
+  faqA: { fontSize: theme.fontSize.sm, lineHeight: 22, color: theme.colors.textSecondary },
+  footerMeta: {
+    fontSize: theme.fontSize.xs,
+    color: theme.colors.textFaint,
+    textAlign: 'center',
+    maxWidth: 520,
+    marginTop: theme.spacing.sm,
+  },
 
   topicsWrap: { flexDirection: 'row', flexWrap: 'wrap', gap: theme.spacing.sm, justifyContent: 'center' },
   topicChip: { paddingHorizontal: theme.spacing.md, paddingVertical: theme.spacing.sm, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.glass.border, backgroundColor: theme.glass.fillSubtle },

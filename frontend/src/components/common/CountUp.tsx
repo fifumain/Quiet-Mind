@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
-import { Text, type TextStyle } from 'react-native';
+import { type TextStyle } from 'react-native';
+import { Text } from './AppText';
 
 interface CountUpProps {
   target: number;

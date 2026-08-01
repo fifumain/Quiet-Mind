@@ -7,8 +7,8 @@ import { useResourceList } from './useResourceList';
 const FAVORITE_QUOTE_IDS_KEY = ['favorites', 'quotes', 'ids'] as const;
 const FAVORITE_QUOTE_LIST_KEY = ['favorites', 'quotes', 'list'] as const;
 
-export function useQuotes(filters: Omit<ListFilters, 'page'>) {
-  return useResourceList(['quotes', 'list'], quotesApi.listQuotes, filters);
+export function useQuotes(filters: Omit<ListFilters, 'page'>, options?: { enabled?: boolean }) {
+  return useResourceList(['quotes', 'list'], quotesApi.listQuotes, filters, options);
 }
 
 export function useQuote(id: number) {
@@ -19,6 +19,8 @@ export function useCategories() {
   return useQuery({
     queryKey: ['categories', 'list'],
     queryFn: () => quotesApi.listCategories(),
+    // Admin-curated taxonomy — it does not change within a session.
+    staleTime: Infinity,
   });
 }
 
@@ -41,8 +43,8 @@ export function useFavoriteQuoteIds() {
   });
 }
 
-export function useFavoriteQuotes() {
-  return useResourceList(FAVORITE_QUOTE_LIST_KEY, quotesApi.listFavoriteQuotes, {});
+export function useFavoriteQuotes(options?: { enabled?: boolean }) {
+  return useResourceList(FAVORITE_QUOTE_LIST_KEY, quotesApi.listFavoriteQuotes, {}, options);
 }
 
 export function useToggleFavoriteQuote() {

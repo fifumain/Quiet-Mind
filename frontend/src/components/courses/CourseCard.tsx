@@ -1,10 +1,13 @@
 import { Image } from 'expo-image';
-import { BookOpen, Check, Users } from 'lucide-react-native';
-import { forwardRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import BookOpen from 'lucide-react-native/icons/book-open';
+import Check from 'lucide-react-native/icons/check';
+import Users from 'lucide-react-native/icons/users';
+import { forwardRef, memo, useState } from 'react';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import type { components } from '../../api/generated/schema';
 import type { CourseProgress } from '../../hooks/useCourses';
-import { glassBlur, theme } from '../../theme/theme';
+import { theme } from '../../theme/theme';
 
 type CourseList = components['schemas']['CourseList'];
 
@@ -18,7 +21,10 @@ interface CourseCardProps {
 // real photo loads) never reads as an empty grey box.
 const COVER_TINTS = ['#1f6d63', '#7a3350', '#3f7a52', '#9a5a22', '#453a86', '#8a6f1f'];
 
-export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
+// memo'd: opening a card re-renders the grid, and without this every other
+// card re-rendered (and re-committed its cover image) during the expand
+// animation. Relies on useCourseProgressMap handing out stable progress objects.
+export const CourseCard = memo(forwardRef<View, CourseCardProps>(function CourseCard(
   { course, progress, onPress },
   ref,
 ) {
@@ -48,13 +54,19 @@ export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
             <BookOpen size={34} color="rgba(245,246,240,0.5)" strokeWidth={1.6} />
           </View>
         )}
-        <View style={[styles.pop, glassBlur(6)]}>
+        {/*
+         * No backdrop-filter on these: they sit on an opaque cover photo, so
+         * the blur is imperceptible, but it cost three live blur regions per
+         * card (~24 on a full grid) that the compositor re-sampled against the
+         * animating aurora every frame. A solid fill looks the same.
+         */}
+        <View style={styles.pop}>
           <Users size={12} color={theme.colors.textPrimary} strokeWidth={2.2} />
           <Text style={styles.popText}>{course.completions_count}</Text>
         </View>
         <View style={styles.cats}>
           {course.categories.slice(0, 2).map((c) => (
-            <View key={c.id} style={[styles.chip, glassBlur(6)]}>
+            <View key={c.id} style={styles.chip}>
               <Text style={styles.chipText}>{c.name}</Text>
             </View>
           ))}
@@ -71,9 +83,9 @@ export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
         <View style={styles.footer}>
           {state === 'new' ? (
             <>
-              <Text style={styles.stagesN}>{course.stage_count} этапов</Text>
+              <Text style={styles.stagesN}>{course.stage_count} stages</Text>
               <View style={styles.ctaPill}>
-                <Text style={styles.ctaPillText}>Начать</Text>
+                <Text style={styles.ctaPillText}>Start</Text>
               </View>
             </>
           ) : state === 'progress' ? (
@@ -84,7 +96,7 @@ export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
                 />
               </View>
               <Text style={styles.ghost}>
-                {progress?.completed}/{course.stage_count} · продолжить
+                {progress?.completed}/{course.stage_count} · continue
               </Text>
             </>
           ) : (
@@ -94,7 +106,7 @@ export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
               </View>
               <View style={styles.ghostRow}>
                 <Check size={13} color={theme.colors.accent} strokeWidth={3} />
-                <Text style={styles.ghost}>Пройдено</Text>
+                <Text style={styles.ghost}>Completed</Text>
               </View>
             </>
           )}
@@ -102,7 +114,7 @@ export const CourseCard = forwardRef<View, CourseCardProps>(function CourseCard(
       </View>
     </Pressable>
   );
-});
+}));
 
 const styles = StyleSheet.create({
   card: {
@@ -127,7 +139,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: theme.radius.pill,
-    backgroundColor: 'rgba(14,31,22,0.5)',
+    backgroundColor: 'rgba(11,26,18,0.66)',
     borderWidth: 1,
     borderColor: theme.glass.border,
   },
@@ -137,7 +149,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 9,
     paddingVertical: 4,
     borderRadius: theme.radius.pill,
-    backgroundColor: 'rgba(14,31,22,0.42)',
+    backgroundColor: 'rgba(11,26,18,0.60)',
     borderWidth: 1,
     borderColor: theme.glass.border,
   },

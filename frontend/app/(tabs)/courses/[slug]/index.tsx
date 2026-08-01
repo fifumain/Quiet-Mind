@@ -1,7 +1,10 @@
 import { Image } from 'expo-image';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { ArrowRight, Check, ChevronLeft } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import Check from 'lucide-react-native/icons/check';
+import ChevronLeft from 'lucide-react-native/icons/chevron-left';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../../../../src/components/common/AppText';
 import { EmptyState } from '../../../../src/components/common/EmptyState';
 import { LoadingSpinner } from '../../../../src/components/common/LoadingSpinner';
 import { ScreenContainer } from '../../../../src/components/common/ScreenContainer';
@@ -22,7 +25,7 @@ export default function CourseRunnerScreen() {
   if (courseQuery.isLoading) {
     return (
       <ScreenContainer>
-        <BackLink label="Курсы" onPress={() => router.navigate('/courses')} />
+        <BackLink label="Courses" onPress={() => router.navigate('/courses')} />
         <LoadingSpinner />
       </ScreenContainer>
     );
@@ -30,8 +33,8 @@ export default function CourseRunnerScreen() {
   if (!courseQuery.data) {
     return (
       <ScreenContainer>
-        <BackLink label="Курсы" onPress={() => router.navigate('/courses')} />
-        <EmptyState message="Курс не найден." />
+        <BackLink label="Courses" onPress={() => router.navigate('/courses')} />
+        <EmptyState message="Course not found." />
       </ScreenContainer>
     );
   }
@@ -55,7 +58,7 @@ export default function CourseRunnerScreen() {
           radius={theme.radius.pill}
           style={styles.primaryBtn}
         >
-          <Text style={styles.primaryBtnText}>Начать курс</Text>
+          <Text style={styles.primaryBtnText}>Start course</Text>
           <ArrowRight size={18} color={theme.gradient[0]} strokeWidth={2.4} />
         </SpecularButton>
       );
@@ -64,13 +67,13 @@ export default function CourseRunnerScreen() {
       return (
         <SpecularButton disabled radius={theme.radius.pill} style={styles.primaryBtn}>
           <Check size={18} color={theme.gradient[0]} strokeWidth={3} />
-          <Text style={styles.primaryBtnText}>Курс пройден</Text>
+          <Text style={styles.primaryBtnText}>Course completed</Text>
         </SpecularButton>
       );
     }
     return (
       <SpecularButton onPress={() => openStage(currentStage)} radius={theme.radius.pill} style={styles.primaryBtn}>
-        <Text style={styles.primaryBtnText}>Продолжить: этап {currentStage}</Text>
+        <Text style={styles.primaryBtnText}>Continue: stage {currentStage}</Text>
         <ArrowRight size={18} color={theme.gradient[0]} strokeWidth={2.4} />
       </SpecularButton>
     );
@@ -78,7 +81,7 @@ export default function CourseRunnerScreen() {
 
   return (
     <ScreenContainer>
-      <BackLink label="Курсы" onPress={() => router.navigate('/courses')} />
+      <BackLink label="Courses" onPress={() => router.navigate('/courses')} />
 
       <View style={[styles.cover, { backgroundColor: tint }]}>
         {course.cover_image ? (
@@ -92,7 +95,7 @@ export default function CourseRunnerScreen() {
               <View style={[styles.barFill, { width: `${total ? Math.round((completedCount / total) * 100) : 0}%` }]} />
             </View>
             <Text style={styles.progText}>
-              {completedCount} / {total} этапов
+              {completedCount} / {total} stages
             </Text>
           </View>
         </View>

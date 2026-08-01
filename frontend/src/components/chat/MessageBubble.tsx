@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import Animated, { FadeInUp } from 'react-native-reanimated';
 import type { ChatMessage } from '../../api/overrides/chat';
 import { glassBlur, theme } from '../../theme/theme';

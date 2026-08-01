@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import { glassBlur, theme } from '../../theme/theme';
 import { injectKeyframes } from './injectKeyframes';
 

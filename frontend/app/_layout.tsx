@@ -50,7 +50,11 @@ function AuthGate() {
 }
 
 export default function RootLayout() {
-  const [fontsLoaded] = useFonts({
+  // Deliberately *not* gating render on this. Blocking the whole app until ~1MB
+  // of webfonts arrives means a blank screen after the JS bundle has already
+  // parsed; React Native falls back to the system font and swaps the real one
+  // in when it lands, which is a much better first-paint story.
+  useFonts({
     Lora_500Medium,
     Lora_600SemiBold,
     Raleway_400Regular,
@@ -64,15 +68,7 @@ export default function RootLayout() {
       <SafeAreaProvider>
         <QueryClientProvider client={queryClient}>
           <StatusBar style="light" />
-          {fontsLoaded ? (
-            <AuthGate />
-          ) : (
-            <GlassBackground>
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <ActivityIndicator color={theme.colors.textPrimary} />
-              </View>
-            </GlassBackground>
-          )}
+          <AuthGate />
         </QueryClientProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

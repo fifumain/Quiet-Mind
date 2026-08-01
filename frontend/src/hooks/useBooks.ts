@@ -7,8 +7,8 @@ import { useResourceList } from './useResourceList';
 const FAVORITE_BOOK_IDS_KEY = ['favorites', 'books', 'ids'] as const;
 const FAVORITE_BOOK_LIST_KEY = ['favorites', 'books', 'list'] as const;
 
-export function useBooks(filters: Omit<ListFilters, 'page'>) {
-  return useResourceList(['books', 'list'], booksApi.listBooks, filters);
+export function useBooks(filters: Omit<ListFilters, 'page'>, options?: { enabled?: boolean }) {
+  return useResourceList(['books', 'list'], booksApi.listBooks, filters, options);
 }
 
 export function useBook(id: number) {
@@ -34,8 +34,8 @@ export function useFavoriteBookIds() {
   });
 }
 
-export function useFavoriteBooks() {
-  return useResourceList(FAVORITE_BOOK_LIST_KEY, booksApi.listFavoriteBooks, {});
+export function useFavoriteBooks(options?: { enabled?: boolean }) {
+  return useResourceList(FAVORITE_BOOK_LIST_KEY, booksApi.listFavoriteBooks, {}, options);
 }
 
 export function useToggleFavoriteBook() {

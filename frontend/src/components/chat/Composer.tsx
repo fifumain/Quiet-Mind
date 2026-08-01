@@ -23,7 +23,7 @@ export function Composer({ onSend, disabled, sending }: ComposerProps) {
     <View style={[styles.container, glassBlur()]}>
       <TextInput
         style={styles.input}
-        placeholder="Написать Alex…"
+        placeholder="Message Alex…"
         placeholderTextColor={theme.colors.textMuted}
         value={value}
         onChangeText={setValue}

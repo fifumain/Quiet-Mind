@@ -1,4 +1,5 @@
-import { StyleSheet, Text, type ViewStyle } from 'react-native';
+import { StyleSheet, type ViewStyle } from 'react-native';
+import { Text } from '../common/AppText';
 import type { components } from '../../api/generated/schema';
 import { useFavoriteQuoteIds, useToggleFavoriteQuote } from '../../hooks/useQuotes';
 import { theme } from '../../theme/theme';
@@ -23,7 +24,7 @@ export function QuoteOfTheDayCard({ quote, style }: { quote: Quote; style?: View
         onPress={() => toggleFavorite.mutate({ id: quote.id, isFavorited })}
         style={styles.heart}
       />
-      <Text style={styles.label}>Цитата дня</Text>
+      <Text style={styles.label}>Quote of the day</Text>
       <Text style={styles.text}>"{quote.text}"</Text>
       <Text style={styles.attrib}>
         — {quote.author.name}

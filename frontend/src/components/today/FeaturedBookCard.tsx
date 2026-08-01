@@ -1,4 +1,5 @@
-import { StyleSheet, Text, type ViewStyle } from 'react-native';
+import { StyleSheet, type ViewStyle } from 'react-native';
+import { Text } from '../common/AppText';
 import type { components } from '../../api/generated/schema';
 import { theme } from '../../theme/theme';
 import { GlassCard } from '../common/GlassCard';
@@ -8,7 +9,7 @@ type Book = components['schemas']['Book'];
 export function FeaturedBookCard({ book, style }: { book: Book; style?: ViewStyle }) {
   return (
     <GlassCard style={style}>
-      <Text style={styles.label}>Книга недели</Text>
+      <Text style={styles.label}>Book of the week</Text>
       <Text style={styles.title}>{book.title}</Text>
       <Text style={styles.author}>{book.author.name}</Text>
       {book.description ? <Text style={styles.description}>{book.description}</Text> : null}

@@ -106,6 +106,11 @@ void main() {
   float midPoint = 0.20;
   float auroraAlpha = smoothstep(midPoint - uBlend * 0.5, midPoint + uBlend * 0.5, intensity);
 
+  // Leave a little of the base gradient showing through even at full ribbon
+  // intensity, so the aurora reads as a layer rather than a replacement.
+  // The real contrast floor is the scrim drawn above this in GlassBackground.
+  auroraAlpha *= 0.85;
+
   vec3 auroraColor = intensity * rampColor;
 
   fragColor = vec4(auroraColor * auroraAlpha, auroraAlpha);
@@ -120,7 +125,7 @@ interface AuroraBackgroundProps {
 }
 
 export function AuroraBackground({
-  colorStops = ['#0E1F16', '#4C7A5C', '#A8C99B'],
+  colorStops = ['#13291C', '#3E7A57', '#58A97A'],
   amplitude = 1.0,
   blend = 0.55,
   speed = 0.4,
@@ -205,12 +210,21 @@ export function AuroraBackground({
     };
     document.addEventListener('visibilitychange', onVisibility);
 
+    // Draw one frame no matter what. Skipping while hidden is right for the
+    // *animation*, but if the app boots in a background tab the canvas would
+    // otherwise stay empty until the tab is focused — the background would
+    // simply be missing on first paint.
+    let hasPainted = false;
+
     let animateId = 0;
     const update = (t: number) => {
       animateId = requestAnimationFrame(update);
-      if (isHidden || isScrolling) return;
-      if (t - lastFrameTime < FRAME_INTERVAL) return;
+      if (hasPainted) {
+        if (isHidden || isScrolling) return;
+        if (t - lastFrameTime < FRAME_INTERVAL) return;
+      }
       lastFrameTime = t;
+      hasPainted = true;
       program.uniforms.uTime.value = t * 0.01 * speed * 0.1;
       renderer.render({ scene: mesh });
     };

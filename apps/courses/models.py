@@ -40,7 +40,7 @@ class CourseStage(TimestampedModel):
         ordering = ["course", "stage_number"]
 
     def __str__(self):
-        return f"{self.course.title} · этап {self.stage_number}: {self.title[:40]}"
+        return f"{self.course.title} · stage {self.stage_number}: {self.title[:40]}"
 
 
 class CourseEnrollment(TimestampedModel):
@@ -70,4 +70,4 @@ class CourseStageCompletion(TimestampedModel):
         unique_together = ["enrollment", "stage"]
 
     def __str__(self):
-        return f"{self.enrollment} ✓ этап {self.stage.stage_number}"
+        return f"{self.enrollment} ✓ stage {self.stage.stage_number}"

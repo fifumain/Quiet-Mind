@@ -1,5 +1,6 @@
 import { useLocalSearchParams } from 'expo-router';
-import { Image, Linking, Pressable, StyleSheet, Text } from 'react-native';
+import { Image, Linking, Pressable, StyleSheet } from 'react-native';
+import { Text } from '../../../../src/components/common/AppText';
 import { EmptyState } from '../../../../src/components/common/EmptyState';
 import { GlassCard } from '../../../../src/components/common/GlassCard';
 import { HeartButton } from '../../../../src/components/common/HeartButton';
@@ -26,7 +27,7 @@ export default function BookDetailScreen() {
   if (!bookQuery.data) {
     return (
       <ScreenContainer>
-        <EmptyState message="Книга не найдена." />
+        <EmptyState message="Book not found." />
       </ScreenContainer>
     );
   }
@@ -55,7 +56,7 @@ export default function BookDetailScreen() {
         <Text style={styles.categories}>{book.categories.map((c) => c.name).join(' · ')}</Text>
         {book.external_url ? (
           <Pressable onPress={() => Linking.openURL(book.external_url!)}>
-            <Text style={styles.link}>Подробнее</Text>
+            <Text style={styles.link}>Learn more</Text>
           </Pressable>
         ) : null}
       </GlassCard>

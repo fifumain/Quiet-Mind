@@ -1,6 +1,8 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { Check, ChevronLeft } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Check from 'lucide-react-native/icons/check';
+import ChevronLeft from 'lucide-react-native/icons/chevron-left';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../../../../../src/components/common/AppText';
 import { EmptyState } from '../../../../../src/components/common/EmptyState';
 import { GlassCard } from '../../../../../src/components/common/GlassCard';
 import { LoadingSpinner } from '../../../../../src/components/common/LoadingSpinner';
@@ -33,7 +35,7 @@ export default function CourseStageScreen() {
     return (
       <ScreenContainer>
         <BackLink onPress={backToCourse} />
-        <EmptyState message="Этап не найден." />
+        <EmptyState message="Stage not found." />
       </ScreenContainer>
     );
   }
@@ -56,14 +58,14 @@ export default function CourseStageScreen() {
       <BackLink onPress={backToCourse} />
 
       <Text style={styles.eyebrow}>
-        {course.title} · этап {stageNo} из {total}
+        {course.title} · stage {stageNo} of {total}
       </Text>
       <Text style={styles.title}>{stage.title}</Text>
       <Text style={styles.body}>{stage.body}</Text>
 
       {stage.quote ? (
         <GlassCard style={styles.refCard}>
-          <Text style={styles.refLabel}>Цитата</Text>
+          <Text style={styles.refLabel}>Quote</Text>
           <Text style={styles.quoteText}>“{stage.quote.text}”</Text>
           <Text style={styles.quoteAuthor}>— {stage.quote.author.name}</Text>
         </GlassCard>
@@ -71,7 +73,7 @@ export default function CourseStageScreen() {
 
       {stage.book ? (
         <GlassCard style={styles.refCard}>
-          <Text style={styles.refLabel}>Книга</Text>
+          <Text style={styles.refLabel}>Book</Text>
           <Text style={styles.bookTitle}>{stage.book.title}</Text>
           <Text style={styles.bookAuthor}>{stage.book.author.name}</Text>
         </GlassCard>
@@ -79,7 +81,7 @@ export default function CourseStageScreen() {
 
       {stage.reflection_prompt ? (
         <View style={styles.reflection}>
-          <Text style={styles.refLabel}>Вопрос для размышления</Text>
+          <Text style={styles.refLabel}>A question to sit with</Text>
           <Text style={styles.reflectionText}>{stage.reflection_prompt}</Text>
         </View>
       ) : null}
@@ -88,7 +90,7 @@ export default function CourseStageScreen() {
         {isCompleted ? (
           <View style={styles.donePill}>
             <Check size={16} color={theme.colors.accent} strokeWidth={3} />
-            <Text style={styles.donePillText}>Этап пройден</Text>
+            <Text style={styles.donePillText}>Stage completed</Text>
           </View>
         ) : (
           <>
@@ -99,15 +101,15 @@ export default function CourseStageScreen() {
               style={[styles.primaryBtn, (isLocked || complete.isPending) && styles.primaryBtnDisabled]}
             >
               <Text style={styles.primaryBtnText}>
-                {complete.isPending ? 'Сохранение…' : 'Отметить пройденным'}
+                {complete.isPending ? 'Saving…' : 'Mark as done'}
               </Text>
             </SpecularButton>
             {isLocked ? (
               <Text style={styles.hint}>
-                {progress ? 'Сначала завершите предыдущий этап.' : 'Начните курс, чтобы отмечать этапы.'}
+                {progress ? 'Finish the previous stage first.' : 'Start the course to mark stages complete.'}
               </Text>
             ) : isCurrent ? (
-              <Text style={styles.hint}>Не торопитесь — отметьте, когда будете готовы.</Text>
+              <Text style={styles.hint}>Take your time — mark it done when you are ready.</Text>
             ) : null}
           </>
         )}
@@ -120,7 +122,7 @@ function BackLink({ onPress }: { onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={styles.back} hitSlop={8}>
       <ChevronLeft size={18} color={theme.colors.accent} strokeWidth={2.4} />
-      <Text style={styles.backText}>К курсу</Text>
+      <Text style={styles.backText}>Back to course</Text>
     </Pressable>
   );
 }

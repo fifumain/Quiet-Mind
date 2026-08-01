@@ -1,6 +1,8 @@
 import { Image } from 'expo-image';
-import { ArrowRight, X } from 'lucide-react-native';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import ArrowRight from 'lucide-react-native/icons/arrow-right';
+import X from 'lucide-react-native/icons/x';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import type { components } from '../../api/generated/schema';
 import type { CourseProgress } from '../../hooks/useCourses';
 import { useCourse } from '../../hooks/useCourses';
@@ -22,13 +24,13 @@ export function CourseDetailPanel({ course, progress, onClose, onOpen }: CourseD
   const detail = useCourse(course.slug);
   const tint = COVER_TINTS[course.id % COVER_TINTS.length];
   const state = progress?.state ?? 'new';
-  const cta = state === 'done' ? 'Повторить курс' : state === 'progress' ? 'Продолжить курс' : 'Начать курс';
+  const cta = state === 'done' ? 'Revisit course' : state === 'progress' ? 'Continue course' : 'Start course';
   const hint =
     state === 'done'
-      ? 'Курс пройден — можно перечитать любой этап'
+      ? 'Course completed — you can revisit any stage'
       : state === 'progress'
-        ? `Продолжите с этапа ${progress?.currentStage}`
-        : 'Запишитесь и начните с этапа 1';
+        ? `Continue from stage ${progress?.currentStage}`
+        : 'Enrol and begin with stage 1';
 
   return (
     <View style={styles.panel}>
@@ -37,7 +39,7 @@ export function CourseDetailPanel({ course, progress, onClose, onOpen }: CourseD
           <Image source={course.cover_image} style={StyleSheet.absoluteFill} contentFit="cover" transition={200} />
         ) : null}
         <View style={styles.coverVeil} />
-        <Pressable onPress={onClose} hitSlop={8} style={[styles.close, glassBlur(6)]} accessibilityLabel="Закрыть">
+        <Pressable onPress={onClose} hitSlop={8} style={[styles.close, glassBlur(6)]} accessibilityLabel="Close">
           <X size={16} color={theme.colors.textPrimary} strokeWidth={2.4} />
         </Pressable>
       </View>
@@ -59,7 +61,7 @@ export function CourseDetailPanel({ course, progress, onClose, onOpen }: CourseD
           <>
             <Text style={styles.desc}>{detail.data?.description || course.teaser}</Text>
             <Text style={styles.sub}>
-              {course.stage_count} этапов · {course.completions_count} прошли
+              {course.stage_count} stages · {course.completions_count} completed
             </Text>
             <View style={styles.syllabus}>
               {(detail.data?.stages ?? []).map((s) => (

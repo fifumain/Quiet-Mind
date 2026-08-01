@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
-import { useEffect, useMemo, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { useCallback, useMemo, useState } from 'react';
+import { FlatList, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Text } from '../../../src/components/common/AppText';
 import { AnimatedEntrance } from '../../../src/components/common/AnimatedEntrance';
 import { ClickSpark } from '../../../src/components/common/ClickSpark';
 import { CountUp } from '../../../src/components/common/CountUp';
@@ -23,24 +24,28 @@ export default function LibraryScreen() {
 
   const [segment, setSegment] = useState<Segment>('quotes');
   const [category, setCategory] = useState<string | undefined>(undefined);
-  const [searchInput, setSearchInput] = useState('');
+  // Only the debounced value lives here; FilterBar owns the raw keystrokes so
+  // typing doesn't re-render this screen (and with it, every list row).
   const [search, setSearch] = useState('');
-
-  useEffect(() => {
-    const timeout = setTimeout(() => setSearch(searchInput), 400);
-    return () => clearTimeout(timeout);
-  }, [searchInput]);
 
   const categoriesQuery = useCategories();
   const categories = categoriesQuery.data?.results ?? [];
 
   const filters = useMemo(() => ({ category, search: search || undefined }), [category, search]);
-  const quotesQuery = useQuotes(filters);
-  const booksQuery = useBooks(filters);
+  const quotesQuery = useQuotes(filters, { enabled: segment === 'quotes' });
+  const booksQuery = useBooks(filters, { enabled: segment === 'books' });
 
   const activeQuery = segment === 'quotes' ? quotesQuery : booksQuery;
-  const quoteItems = quotesQuery.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
-  const bookItems = booksQuery.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
+  const quotesData = quotesQuery.data;
+  const booksData = booksQuery.data;
+  const quoteItems = useMemo(
+    () => quotesData?.pages.flatMap((page) => page?.results ?? []) ?? [],
+    [quotesData],
+  );
+  const bookItems = useMemo(
+    () => booksData?.pages.flatMap((page) => page?.results ?? []) ?? [],
+    [booksData],
+  );
 
   const total = activeQuery.data?.pages[0]?.count ?? 0;
 
@@ -55,8 +60,8 @@ export default function LibraryScreen() {
     <View style={styles.header}>
       <View style={styles.topRow}>
         <View style={[styles.segment, glassBlur()]}>
-          <SegmentButton label="Цитаты" active={segment === 'quotes'} onPress={() => setSegment('quotes')} />
-          <SegmentButton label="Книги" active={segment === 'books'} onPress={() => setSegment('books')} />
+          <SegmentButton label="Quotes" active={segment === 'quotes'} onPress={() => setSegment('quotes')} />
+          <SegmentButton label="Books" active={segment === 'books'} onPress={() => setSegment('books')} />
         </View>
         <TouchableOpacity style={[styles.historyLink, glassBlur()]} onPress={() => router.navigate('/library/history')}>
           <Text style={styles.historyLinkText}>Time Capsule</Text>
@@ -66,12 +71,11 @@ export default function LibraryScreen() {
         categories={categories}
         selectedCategory={category}
         onSelectCategory={setCategory}
-        search={searchInput}
-        onChangeSearch={setSearchInput}
+        onSearch={setSearch}
       />
       {!activeQuery.isLoading ? (
         <Text style={styles.total}>
-          <CountUp target={total} /> {segment === 'quotes' ? 'цитат' : 'книг'} найдено
+          <CountUp target={total} /> {segment === 'quotes' ? 'quotes' : 'books'} found
         </Text>
       ) : null}
     </View>
@@ -81,15 +85,67 @@ export default function LibraryScreen() {
   const footer = activeQuery.hasNextPage ? (
     <ClickSpark style={styles.moreSparkWrap} onPress={() => activeQuery.fetchNextPage()}>
       <View style={[styles.moreButton, glassBlur()]}>
-        <Text style={styles.moreText}>{activeQuery.isFetchingNextPage ? 'Загрузка…' : 'Показать ещё'}</Text>
+        <Text style={styles.moreText}>{activeQuery.isFetchingNextPage ? 'Loading…' : 'Show more'}</Text>
       </View>
     </ClickSpark>
   ) : null;
 
   const columnWrapper = columns > 1 ? { gap: theme.spacing.md } : undefined;
 
+  // Hoisted out of JSX: an inline renderItem is a new function identity every
+  // render, which makes VirtualizedList re-render every mounted cell.
+  const renderQuote = useCallback(
+    ({ item, index }: { item: (typeof quoteItems)[number]; index: number }) => {
+      const isFavorited = favoriteQuoteIdSet.has(item.id);
+      return (
+        <AnimatedEntrance index={index} style={styles.cell}>
+          <ListItem
+            title={`"${item.text}"`}
+            subtitle={item.author.name}
+            onPress={() => router.navigate(`/library/quotes/${item.id}`)}
+            isFavorited={isFavorited}
+            onToggleFavorite={() => toggleFavoriteQuote.mutate({ id: item.id, isFavorited })}
+          />
+        </AnimatedEntrance>
+      );
+    },
+    [favoriteQuoteIdSet, router, toggleFavoriteQuote],
+  );
+
+  const renderBook = useCallback(
+    ({ item, index }: { item: (typeof bookItems)[number]; index: number }) => {
+      const isFavorited = favoriteBookIdSet.has(item.id);
+      return (
+        <AnimatedEntrance index={index} style={styles.cell}>
+          <ListItem
+            title={item.title}
+            subtitle={item.author.name}
+            onPress={() => router.navigate(`/library/books/${item.id}`)}
+            isFavorited={isFavorited}
+            onToggleFavorite={() => toggleFavoriteBook.mutate({ id: item.id, isFavorited })}
+          />
+        </AnimatedEntrance>
+      );
+    },
+    [favoriteBookIdSet, router, toggleFavoriteBook],
+  );
+
+  /**
+   * Defaults would keep ~21 viewports mounted; with a 20-item page that means
+   * nothing is actually virtualised and every row (a blurred glass panel)
+   * stays live. These bring it back to a real window.
+   */
+  const virtualization = {
+    initialNumToRender: 6,
+    windowSize: 5,
+    maxToRenderPerBatch: 8,
+    // NB: no `removeClippedSubviews` — on react-native-web it detaches cells in
+    // a way that leaves gaps in the grid. The window settings above already do
+    // the heavy lifting.
+  } as const;
+
   return (
-    <ScreenContainer title="Библиотека" scroll={false}>
+    <ScreenContainer title="Library" scroll={false}>
       {activeQuery.isLoading ? (
         <>
           {header}
@@ -104,22 +160,11 @@ export default function LibraryScreen() {
           keyExtractor={(item) => String(item.id)}
           ListHeaderComponent={header}
           ListFooterComponent={footer}
-          ListEmptyComponent={<EmptyState message="Ничего не найдено." />}
+          ListEmptyComponent={<EmptyState message="Nothing found." />}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <AnimatedEntrance index={index} style={styles.cell}>
-              <ListItem
-                title={`"${item.text}"`}
-                subtitle={item.author.name}
-                onPress={() => router.navigate(`/library/quotes/${item.id}`)}
-                isFavorited={favoriteQuoteIdSet.has(item.id)}
-                onToggleFavorite={() =>
-                  toggleFavoriteQuote.mutate({ id: item.id, isFavorited: favoriteQuoteIdSet.has(item.id) })
-                }
-              />
-            </AnimatedEntrance>
-          )}
+          renderItem={renderQuote}
+          {...virtualization}
         />
       ) : (
         <FlatList
@@ -130,22 +175,11 @@ export default function LibraryScreen() {
           keyExtractor={(item) => String(item.id)}
           ListHeaderComponent={header}
           ListFooterComponent={footer}
-          ListEmptyComponent={<EmptyState message="Ничего не найдено." />}
+          ListEmptyComponent={<EmptyState message="Nothing found." />}
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
-          renderItem={({ item, index }) => (
-            <AnimatedEntrance index={index} style={styles.cell}>
-              <ListItem
-                title={item.title}
-                subtitle={item.author.name}
-                onPress={() => router.navigate(`/library/books/${item.id}`)}
-                isFavorited={favoriteBookIdSet.has(item.id)}
-                onToggleFavorite={() =>
-                  toggleFavoriteBook.mutate({ id: item.id, isFavorited: favoriteBookIdSet.has(item.id) })
-                }
-              />
-            </AnimatedEntrance>
-          )}
+          renderItem={renderBook}
+          {...virtualization}
         />
       )}
     </ScreenContainer>
@@ -183,7 +217,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
   },
   segmentButton: { paddingHorizontal: theme.spacing.md, paddingVertical: 6, borderRadius: theme.radius.sm },
-  segmentButtonActive: { backgroundColor: theme.glass.fillStrong },
+  segmentButtonActive: { backgroundColor: theme.glass.selected },
   segmentText: { fontSize: theme.fontSize.sm, fontWeight: '600', color: theme.colors.textMuted },
   segmentTextActive: { color: theme.colors.textPrimary },
   list: { gap: theme.spacing.md, paddingBottom: theme.spacing.xl, maxWidth: 900, width: '100%', alignSelf: 'center' },

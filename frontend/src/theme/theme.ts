@@ -6,25 +6,62 @@ import { Platform } from 'react-native';
  * glass panels over it. Single visual world by design — no light/dark switch.
  */
 export const theme = {
-  // Background gradient (top -> bottom), used by GlassBackground.
-  gradient: ['#0E1F16', '#1E3B29', '#4C7A5C', '#A8C99B'] as const,
+  /**
+   * Background gradient (top -> bottom), used by GlassBackground.
+   * Deliberately kept in a dark range: the gradient is viewport-fixed, so a
+   * light stop would sit permanently under the bottom of every screen (where
+   * the nav bar and the chat composer live) and sink text contrast there.
+   * The green character comes from `auroraStops` instead, which is decorative.
+   */
+  gradient: ['#0E1F16', '#16301F', '#1F3A29', '#2A4A34'] as const,
+
+  /**
+   * Colours for the animated aurora — kept saturated, because the colour is
+   * what gives the app its character. It's safe to keep them vivid only
+   * because `scrim` below caps how much luminance ever reaches the text.
+   */
+  auroraStops: ['#13291C', '#3E7A57', '#58A97A'] as const,
+
+  /**
+   * Dark veil painted over the aurora and under all content. This is what
+   * guarantees a contrast floor: without it a bright aurora ribbon becomes the
+   * text backdrop and every readability guarantee below is off by 2-3x.
+   */
+  scrim: 'rgba(10,22,15,0.45)',
 
   colors: {
-    // Text on the glass/gradient.
+    // Text on the glass/gradient. Alphas are chosen so all three levels clear
+    // 4.5:1 on the darkest AND lightest surface in the system (see the audit).
     textPrimary: '#F5F6F0',
-    textSecondary: 'rgba(245,246,240,0.72)',
-    textMuted: 'rgba(245,246,240,0.55)',
+    textSecondary: 'rgba(245,246,240,0.82)',
+    textMuted: 'rgba(245,246,240,0.74)',
+    /** Decorative only — never for text that carries information. */
+    textFaint: 'rgba(245,246,240,0.58)',
     accent: '#E3D9A0', // warm sand — active states, highlights
     danger: '#E8B0A0',
   },
 
-  // Translucent glass surfaces layered over the gradient.
+  /**
+   * Glass surfaces. These *darken* what's behind them rather than lightening:
+   * on a dark theme a white scrim raises the surface luminance and destroys
+   * text contrast (especially over a bright aurora ribbon). A dark scrim plus
+   * a light hairline border gives the same "frosted" read and keeps contrast
+   * independent of whatever is drifting behind the panel.
+   * Ordering is by prominence: `fillStrong` is the least-dark (most raised).
+   */
   glass: {
-    fill: 'rgba(255,255,255,0.13)',
-    fillStrong: 'rgba(255,255,255,0.20)',
-    fillSubtle: 'rgba(255,255,255,0.09)',
-    border: 'rgba(255,255,255,0.22)',
-    borderStrong: 'rgba(255,255,255,0.30)',
+    fillStrong: 'rgba(11,26,18,0.28)',
+    fill: 'rgba(11,26,18,0.40)',
+    fillSubtle: 'rgba(11,26,18,0.52)',
+    border: 'rgba(255,255,255,0.42)',
+    borderStrong: 'rgba(255,255,255,0.54)',
+    /**
+     * Selected/active affordance for chips, segments and tabs. Accent-tinted
+     * rather than "lighter", because every surface fill here darkens — so
+     * "more prominent" has to be signalled by hue, not by luminance.
+     */
+    selected: 'rgba(227,217,160,0.18)',
+    selectedBorder: 'rgba(227,217,160,0.55)',
   },
 
   spacing: { xs: 4, sm: 8, md: 16, lg: 24, xl: 32 },

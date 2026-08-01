@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import { SpecularButton } from '../common/SpecularButton';
 import { glassBlur, theme } from '../../theme/theme';
 import { useAuthStore } from '../../store/authStore';
@@ -8,6 +9,7 @@ const NAV = [
   { label: 'Features', target: 'features' },
   { label: 'Screens', target: 'screens' },
   { label: 'Topics', target: 'topics' },
+  { label: 'FAQ', target: 'faq' },
 ] as const;
 
 function scrollToSection(id: string) {

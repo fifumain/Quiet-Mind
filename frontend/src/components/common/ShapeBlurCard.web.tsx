@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 
 interface ShapeBlurCardProps {
@@ -16,23 +16,54 @@ interface ShapeBlurCardProps {
  * this ports the same idea — a soft light that follows the cursor — as a
  * cheap CSS radial-gradient mutated directly via ref (no React re-render
  * per mousemove). Web-only: native has no persistent pointer to track.
+ *
+ * The rect is cached rather than measured per mousemove: `getBoundingClientRect`
+ * forces a synchronous layout, and with a list of these the cursor crossing the
+ * screen triggered one flush per card per pointer event.
  */
 export function ShapeBlurCard({ children, style }: ShapeBlurCardProps) {
   const wrapRef = useRef<View>(null);
   const glowRef = useRef<View>(null);
+  const rectRef = useRef<DOMRect | null>(null);
+  const frameRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    // Invalidate on anything that can move the element; re-measured lazily on
+    // the next hover rather than eagerly here.
+    const invalidate = () => {
+      rectRef.current = null;
+    };
+    window.addEventListener('resize', invalidate);
+    document.addEventListener('scroll', invalidate, { capture: true, passive: true });
+    return () => {
+      window.removeEventListener('resize', invalidate);
+      document.removeEventListener('scroll', invalidate, true);
+      if (frameRef.current != null) cancelAnimationFrame(frameRef.current);
+    };
+  }, []);
 
   const handleMove = (event: { nativeEvent: { clientX: number; clientY: number } }) => {
     const wrap = wrapRef.current as unknown as HTMLDivElement | null;
     const glow = glowRef.current as unknown as HTMLDivElement | null;
     if (!wrap || !glow) return;
-    const rect = wrap.getBoundingClientRect();
+
+    if (!rectRef.current) rectRef.current = wrap.getBoundingClientRect();
+    const rect = rectRef.current;
     const { clientX, clientY } = event.nativeEvent;
     const x = clientX - rect.left;
     const y = clientY - rect.top;
-    glow.style.background = `radial-gradient(180px circle at ${x}px ${y}px, rgba(245,246,240,0.16), transparent 70%)`;
+
+    // Coalesce to one style write per frame — pointermove fires far more often
+    // than the compositor can repaint a backdrop-filtered panel.
+    if (frameRef.current != null) return;
+    frameRef.current = requestAnimationFrame(() => {
+      frameRef.current = null;
+      glow.style.background = `radial-gradient(180px circle at ${x}px ${y}px, rgba(245,246,240,0.16), transparent 70%)`;
+    });
   };
 
   const handleLeave = () => {
+    rectRef.current = null;
     const glow = glowRef.current as unknown as HTMLDivElement | null;
     if (glow) glow.style.background = 'transparent';
   };

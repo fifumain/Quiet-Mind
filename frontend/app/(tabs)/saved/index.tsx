@@ -1,6 +1,7 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { FlatList, StyleSheet, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { Text } from '../../../src/components/common/AppText';
 import Animated, { FadeInDown, FadeOut } from 'react-native-reanimated';
 import { ClickSpark } from '../../../src/components/common/ClickSpark';
 import { CountUp } from '../../../src/components/common/CountUp';
@@ -15,11 +16,11 @@ import { glassBlur, theme } from '../../../src/theme/theme';
 
 type Segment = 'quotes' | 'books';
 
-const MONTHS_RU = ['янв', 'фев', 'мар', 'апр', 'май', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function formatSavedAt(iso: string) {
   const [y, m, d] = iso.slice(0, 10).split('-').map(Number);
-  return `${d} ${MONTHS_RU[m - 1]} ${y}`;
+  return `${MONTHS[m - 1]} ${d}, ${y}`;
 }
 
 export default function SavedScreen() {
@@ -30,8 +31,8 @@ export default function SavedScreen() {
   const [segment, setSegment] = useState<Segment>('quotes');
   const [pendingRemovals, setPendingRemovals] = useState<Set<number>>(new Set());
 
-  const favoriteQuotes = useFavoriteQuotes();
-  const favoriteBooks = useFavoriteBooks();
+  const favoriteQuotes = useFavoriteQuotes({ enabled: segment === 'quotes' });
+  const favoriteBooks = useFavoriteBooks({ enabled: segment === 'books' });
   const toggleFavoriteQuote = useToggleFavoriteQuote();
   const toggleFavoriteBook = useToggleFavoriteBook();
 
@@ -55,17 +56,17 @@ export default function SavedScreen() {
 
   const header = (
     <View style={styles.header}>
-      <GradientText style={styles.title}>Избранное</GradientText>
-      <Text style={styles.subtitle}>Цитаты и книги, которые вы решили сохранить.</Text>
+      <GradientText style={styles.title}>Saved</GradientText>
+      <Text style={styles.subtitle}>Quotes and books you chose to keep.</Text>
 
       <View style={[styles.segment, glassBlur()]}>
-        <SegmentButton label="Цитаты" active={segment === 'quotes'} onPress={() => setSegment('quotes')} />
-        <SegmentButton label="Книги" active={segment === 'books'} onPress={() => setSegment('books')} />
+        <SegmentButton label="Quotes" active={segment === 'quotes'} onPress={() => setSegment('quotes')} />
+        <SegmentButton label="Books" active={segment === 'books'} onPress={() => setSegment('books')} />
       </View>
 
       {!activeQuery.isLoading ? (
         <Text style={styles.total}>
-          <CountUp target={total} /> {segment === 'quotes' ? 'сохранённых цитат' : 'сохранённых книг'}
+          <CountUp target={total} /> {segment === 'quotes' ? 'saved quotes' : 'saved books'}
         </Text>
       ) : null}
     </View>
@@ -74,7 +75,7 @@ export default function SavedScreen() {
   const footer = activeQuery.hasNextPage ? (
     <ClickSpark style={styles.moreSparkWrap} onPress={() => activeQuery.fetchNextPage()}>
       <View style={[styles.moreButton, glassBlur()]}>
-        <Text style={styles.moreText}>{activeQuery.isFetchingNextPage ? 'Загрузка…' : 'Показать ещё'}</Text>
+        <Text style={styles.moreText}>{activeQuery.isFetchingNextPage ? 'Loading…' : 'Show more'}</Text>
       </View>
     </ClickSpark>
   ) : null;
@@ -85,8 +86,8 @@ export default function SavedScreen() {
       <RotatingText
         style={styles.emptyText}
         phrases={[
-          'Пока пусто.',
-          'Нажмите ♡ на любой цитате или книге, чтобы сохранить её здесь.',
+          'Nothing saved yet.',
+          'Tap ♡ on any quote or book to keep it here.',
         ]}
       />
     </View>
@@ -185,7 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: theme.radius.md,
   },
   segmentButton: { paddingHorizontal: theme.spacing.md, paddingVertical: 6, borderRadius: theme.radius.sm },
-  segmentButtonActive: { backgroundColor: theme.glass.fillStrong },
+  segmentButtonActive: { backgroundColor: theme.glass.selected },
   segmentText: { fontSize: theme.fontSize.sm, fontWeight: '600', color: theme.colors.textMuted },
   segmentTextActive: { color: theme.colors.textPrimary },
   total: { fontSize: theme.fontSize.xs, color: theme.colors.textMuted },

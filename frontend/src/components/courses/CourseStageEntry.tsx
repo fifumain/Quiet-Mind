@@ -1,5 +1,7 @@
-import { Check, Lock } from 'lucide-react-native';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import Check from 'lucide-react-native/icons/check';
+import Lock from 'lucide-react-native/icons/lock';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import { AnimatedEntrance } from '../common/AnimatedEntrance';
 import { GlareHover } from '../common/GlareHover';
 import { GlowBorder } from '../common/GlowBorder';
@@ -32,7 +34,7 @@ export function CourseStageEntry({ index, isLast, status, stageNumber, title, pr
           </Text>
           {status === 'current' ? (
             <View style={styles.currentPill}>
-              <Text style={styles.currentPillText}>ТЕКУЩИЙ</Text>
+              <Text style={styles.currentPillText}>CURRENT</Text>
             </View>
           ) : status === 'locked' ? (
             <View style={styles.lockPill}>

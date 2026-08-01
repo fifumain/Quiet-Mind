@@ -1,4 +1,6 @@
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { memo } from 'react';
+import { Pressable, StyleSheet } from 'react-native';
+import { Text } from '../common/AppText';
 import { HeartButton } from '../common/HeartButton';
 import { ShapeBlurCard } from '../common/ShapeBlurCard';
 import { glassBlur, theme } from '../../theme/theme';
@@ -11,7 +13,7 @@ interface ListItemProps {
   onToggleFavorite?: () => void;
 }
 
-export function ListItem({ title, subtitle, onPress, isFavorited, onToggleFavorite }: ListItemProps) {
+export const ListItem = memo(function ListItem({ title, subtitle, onPress, isFavorited, onToggleFavorite }: ListItemProps) {
   return (
     <ShapeBlurCard style={[styles.container, glassBlur(16)]}>
       <Pressable style={styles.pressable} onPress={onPress}>
@@ -27,7 +29,7 @@ export function ListItem({ title, subtitle, onPress, isFavorited, onToggleFavori
       ) : null}
     </ShapeBlurCard>
   );
-}
+})
 
 const styles = StyleSheet.create({
   container: {

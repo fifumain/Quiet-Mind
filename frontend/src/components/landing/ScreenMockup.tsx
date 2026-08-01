@@ -1,6 +1,7 @@
 import { LinearGradient } from 'expo-linear-gradient';
 import type { ReactNode } from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import { glassBlur, theme } from '../../theme/theme';
 
 type ScreenKind = 'today' | 'chat' | 'library';
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   bubbleText: { fontSize: 10, color: theme.colors.textPrimary },
   pillsRow: { flexDirection: 'row', gap: 5 },
   miniPill: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: theme.radius.pill, borderWidth: 1, borderColor: theme.glass.border },
-  miniPillActive: { backgroundColor: theme.glass.fillStrong, borderColor: 'transparent' },
+  miniPillActive: { backgroundColor: theme.glass.selected, borderColor: theme.glass.selectedBorder },
   miniPillText: { fontSize: 10, color: theme.colors.textPrimary, fontWeight: '600' },
   miniPillTextMuted: { fontSize: 10, color: theme.colors.textMuted, fontWeight: '600' },
 });

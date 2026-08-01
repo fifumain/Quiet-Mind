@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { Platform, Text, type TextStyle } from 'react-native';
+import { Platform, type TextStyle } from 'react-native';
+import { Text } from '../common/AppText';
 import { theme } from '../../theme/theme';
 import { injectKeyframes } from './injectKeyframes';
 

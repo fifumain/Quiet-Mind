@@ -20,7 +20,15 @@ export function GlassBackground({ children }: { children: ReactNode }) {
         end={{ x: 0.9, y: 1 }}
         style={StyleSheet.absoluteFill}
       />
-      <AuroraBackground colorStops={[theme.gradient[0], theme.gradient[2], theme.gradient[3]]} />
+      <AuroraBackground colorStops={[theme.auroraStops[0], theme.auroraStops[1], theme.auroraStops[2]]} />
+      {/*
+       * Contrast floor. The aurora is deliberately saturated, which means a
+       * bright ribbon would otherwise become the backdrop for whatever text is
+       * over it. This veil caps how light the background can ever get, so the
+       * readability guarantees in theme.ts hold no matter where the ribbons
+       * drift. It sits above the aurora and below all content.
+       */}
+      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.scrim]} />
       <NoiseOverlay />
       {children}
     </View>
@@ -29,4 +37,5 @@ export function GlassBackground({ children }: { children: ReactNode }) {
 
 const styles = StyleSheet.create({
   fill: { flex: 1 },
+  scrim: { backgroundColor: theme.scrim },
 });

@@ -1,6 +1,7 @@
 import { Link } from 'expo-router';
 import { useState } from 'react';
-import { ActivityIndicator, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, TextInput, View } from 'react-native';
+import { Text } from '../../src/components/common/AppText';
 import { GlassBackground } from '../../src/components/common/GlassBackground';
 import { SpecularButton } from '../../src/components/common/SpecularButton';
 import { useRegister } from '../../src/hooks/useAuth';
@@ -19,11 +20,11 @@ export default function RegisterScreen() {
     <GlassBackground>
       <View style={styles.container}>
         <Text style={styles.brand}>Alex</Text>
-        <Text style={styles.title}>Создать аккаунт</Text>
+        <Text style={styles.title}>Create account</Text>
 
         <TextInput
           style={[styles.input, glassBlur()]}
-          placeholder="Имя пользователя"
+          placeholder="Username"
           placeholderTextColor={theme.colors.textMuted}
           autoCapitalize="none"
           value={username}
@@ -40,7 +41,7 @@ export default function RegisterScreen() {
         />
         <TextInput
           style={[styles.input, glassBlur()]}
-          placeholder="Пароль (минимум 8 символов)"
+          placeholder="Password (at least 8 characters)"
           placeholderTextColor={theme.colors.textMuted}
           secureTextEntry
           value={password}
@@ -48,7 +49,7 @@ export default function RegisterScreen() {
         />
 
         {register.isError ? (
-          <Text style={styles.error}>{formatApiError(register.error, 'Не удалось зарегистрироваться. Проверьте данные.')}</Text>
+          <Text style={styles.error}>{formatApiError(register.error, 'Could not sign you up. Check the details and try again.')}</Text>
         ) : null}
 
         <SpecularButton
@@ -59,12 +60,12 @@ export default function RegisterScreen() {
           {register.isPending ? (
             <ActivityIndicator color={theme.gradient[0]} />
           ) : (
-            <Text style={styles.buttonText}>Зарегистрироваться</Text>
+            <Text style={styles.buttonText}>Create account</Text>
           )}
         </SpecularButton>
 
         <Link href="/login" style={styles.link}>
-          Уже есть аккаунт? Войти
+          Already have an account? Log in
         </Link>
       </View>
     </GlassBackground>

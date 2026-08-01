@@ -1,4 +1,5 @@
-import { StyleSheet, Text, type StyleProp, type ViewStyle } from 'react-native';
+import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
+import { Text } from './AppText';
 import { ClickSpark } from './ClickSpark';
 import { theme } from '../../theme/theme';
 

@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from '../common/AppText';
 import Animated, { ZoomIn } from 'react-native-reanimated';
 import { GlareHover } from '../common/GlareHover';
 import { glassBlur, theme } from '../../theme/theme';

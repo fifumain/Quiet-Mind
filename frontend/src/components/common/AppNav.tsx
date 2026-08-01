@@ -1,13 +1,14 @@
 import { usePathname, useRouter } from 'expo-router';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, View } from 'react-native';
+import { Text } from './AppText';
 import { glassBlur, theme } from '../../theme/theme';
 
 const ITEMS = [
-  { label: 'Сегодня', path: '/today' },
-  { label: 'Чат', path: '/chat' },
-  { label: 'Библиотека', path: '/library' },
-  { label: 'Курсы', path: '/courses' },
-  { label: 'Избранное', path: '/saved' },
+  { label: 'Today', path: '/today' },
+  { label: 'Chat', path: '/chat' },
+  { label: 'Library', path: '/library' },
+  { label: 'Courses', path: '/courses' },
+  { label: 'Saved', path: '/saved' },
 ] as const;
 
 export function AppNav({ variant }: { variant: 'sidebar' | 'bottom' }) {

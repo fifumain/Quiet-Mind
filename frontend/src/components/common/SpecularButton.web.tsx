@@ -122,8 +122,16 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
     fx.appendChild(gl.canvas);
 
     const sizeRef = { w: 1, h: 1 };
+    // Cached viewport rect. Reading getBoundingClientRect() on every pointermove
+    // forces a synchronous layout on each button, so instead it's refreshed only
+    // when something can actually have moved it (resize / scroll).
+    let rect = btn.getBoundingClientRect();
+    const readRect = () => {
+      rect = btn.getBoundingClientRect();
+    };
+
     const resize = () => {
-      const rect = btn.getBoundingClientRect();
+      readRect();
       const w = rect.width;
       const h = rect.height;
       sizeRef.w = w;
@@ -135,12 +143,12 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
     const ro = new ResizeObserver(resize);
     ro.observe(btn);
     resize();
+    document.addEventListener('scroll', readRect, { capture: true, passive: true });
 
     let pointerAngle: number | null = null;
     let proximityT = 0;
     const proximity = 250;
     const onPointerMove = (e: PointerEvent) => {
-      const rect = btn.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
       const dx = Math.max(rect.left - e.clientX, 0, e.clientX - rect.right);
@@ -156,7 +164,7 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
       const t = Math.max(0, 1 - dist / proximity);
       proximityT = t * t * (3 - 2 * t);
     };
-    window.addEventListener('pointermove', onPointerMove);
+    window.addEventListener('pointermove', onPointerMove, { passive: true });
 
     let angle = 2.4;
     let idleAngle = 2.4;
@@ -167,10 +175,30 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
     const lineC = new Color(theme.colors.accent);
     const baseC = new Color('#2E362B');
 
+    // Same budget as the aurora: 30fps ceiling, nothing at all while the tab is
+    // hidden. On top of that, skip rendering entirely once the rim light has
+    // faded out — the shader's `hi` term is multiplied by uIntensity, so with
+    // the cursor away the drifting angle changes literally nothing on screen.
+    // Without this every one of these buttons ran a 60fps WebGL loop forever
+    // (three of them on the landing page alone).
+    const FRAME_INTERVAL = 1000 / 30;
+    const IDLE_EPSILON = 0.004;
+    let lastFrameTime = 0;
+    let settled = false;
+    let isHidden = document.hidden;
+    const onVisibility = () => {
+      isHidden = document.hidden;
+    };
+    document.addEventListener('visibilitychange', onVisibility);
+
     const update = (now: number) => {
       raf = requestAnimationFrame(update);
+      if (isHidden) return;
+      if (now - lastFrameTime < FRAME_INTERVAL) return;
+
       const dt = Math.min((now - last) / 1000, 0.05);
       last = now;
+      lastFrameTime = now;
 
       idleAngle += 0.35 * dt;
       const target = pointerAngle != null ? pointerAngle : idleAngle;
@@ -178,6 +206,14 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
       angle += diff * (1 - Math.exp(-dt * 7));
 
       bright += (proximityT - bright) * (1 - Math.exp(-dt * 8));
+
+      if (bright < IDLE_EPSILON && proximityT < IDLE_EPSILON) {
+        // Render one final frame to clear the rim, then go quiet.
+        if (settled) return;
+        settled = true;
+      } else {
+        settled = false;
+      }
 
       program.uniforms.uAngle.value = angle;
       program.uniforms.uRadius.value = Math.min(radius, Math.min(sizeRef.w, sizeRef.h) / 2) * dpr;
@@ -192,6 +228,8 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
       cancelAnimationFrame(raf);
       ro.disconnect();
       window.removeEventListener('pointermove', onPointerMove);
+      document.removeEventListener('scroll', readRect, true);
+      document.removeEventListener('visibilitychange', onVisibility);
       if (gl.canvas.parentNode === fx) fx.removeChild(gl.canvas);
       gl.getExtension('WEBGL_lose_context')?.loseContext();
     };
