@@ -4,3 +4,5 @@
 
 expo-env.d.ts
 # @end expo-cli
+# cached Wikimedia sources for scripts/build-portraits.py
+scripts/.portrait-cache/

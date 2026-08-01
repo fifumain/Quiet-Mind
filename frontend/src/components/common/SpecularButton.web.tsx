@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { Pressable, StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
 import { theme } from '../../theme/theme';
+import { noPointer } from './noPointer';
 
 const PAD = 20;
 
@@ -237,7 +238,7 @@ export function SpecularButton({ children, onPress, disabled, style, radius = 14
 
   return (
     <Pressable ref={btnRef} onPress={onPress} disabled={disabled} style={[styles.button, style]}>
-      <View ref={fxRef} pointerEvents="none" style={styles.fx} />
+      <View ref={fxRef} style={[styles.fx, noPointer]} />
       {children}
     </Pressable>
   );

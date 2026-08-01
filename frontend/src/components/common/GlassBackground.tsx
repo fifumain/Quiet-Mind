@@ -4,6 +4,7 @@ import { StyleSheet, View } from 'react-native';
 import { theme } from '../../theme/theme';
 import { AuroraBackground } from './AuroraBackground';
 import { NoiseOverlay } from './NoiseOverlay';
+import { noPointer } from './noPointer';
 
 /**
  * The forest gradient every screen sits on. On web, a live WebGL aurora
@@ -28,7 +29,7 @@ export function GlassBackground({ children }: { children: ReactNode }) {
        * readability guarantees in theme.ts hold no matter where the ribbons
        * drift. It sits above the aurora and below all content.
        */}
-      <View pointerEvents="none" style={[StyleSheet.absoluteFill, styles.scrim]} />
+      <View style={[StyleSheet.absoluteFill, styles.scrim, noPointer]} />
       <NoiseOverlay />
       {children}
     </View>

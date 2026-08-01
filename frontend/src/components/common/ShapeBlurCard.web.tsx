@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useEffect, useRef } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { noPointer } from './noPointer';
 
 interface ShapeBlurCardProps {
   children: ReactNode;
@@ -71,7 +72,7 @@ export function ShapeBlurCard({ children, style }: ShapeBlurCardProps) {
   return (
     // @ts-expect-error — onMouseMove/onMouseLeave pass through to the underlying DOM node on web.
     <View ref={wrapRef} style={[styles.wrap, style]} onMouseMove={handleMove} onMouseLeave={handleLeave}>
-      <View ref={glowRef} pointerEvents="none" style={StyleSheet.absoluteFill} />
+      <View ref={glowRef} style={[StyleSheet.absoluteFill, noPointer]} />
       {children}
     </View>
   );

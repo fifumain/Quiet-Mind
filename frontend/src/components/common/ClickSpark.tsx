@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Pressable, StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { Easing, type SharedValue, useAnimatedStyle, useSharedValue, withTiming } from 'react-native-reanimated';
 import { theme } from '../../theme/theme';
+import { noPointer } from './noPointer';
 
 const SPARK_COUNT = 6;
 const SPARK_DISTANCE = 22;
@@ -72,7 +73,7 @@ function SparkDot({
     };
   });
 
-  return <Animated.View pointerEvents="none" style={[styles.dot, animatedStyle]} />;
+  return <Animated.View style={[styles.dot, animatedStyle, noPointer]} />;
 }
 
 const styles = StyleSheet.create({

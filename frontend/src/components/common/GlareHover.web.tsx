@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { useRef } from 'react';
 import { StyleSheet, View, type StyleProp, type ViewStyle } from 'react-native';
+import { noPointer } from './noPointer';
 
 interface GlareHoverProps {
   children: ReactNode;
@@ -27,7 +28,7 @@ export function GlareHover({ children, style }: GlareHoverProps) {
   return (
     // @ts-expect-error — onMouseEnter/onMouseLeave pass through to the underlying DOM node on web.
     <View style={[styles.wrap, style]} onMouseEnter={() => setGlare(true)} onMouseLeave={() => setGlare(false)}>
-      <View ref={glareRef} pointerEvents="none" style={styles.glare} />
+      <View ref={glareRef} style={[styles.glare, noPointer]} />
       {children}
     </View>
   );

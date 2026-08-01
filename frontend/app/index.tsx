@@ -9,6 +9,7 @@ import { GradientText } from '../src/components/landing/GradientText';
 import { Marquee } from '../src/components/landing/Marquee';
 import { ScreenMockup } from '../src/components/landing/ScreenMockup';
 import { ScrollReveal } from '../src/components/landing/ScrollReveal';
+import { PinnedStage } from '../src/components/landing/PinnedStage';
 import { ShinyText } from '../src/components/landing/ShinyText';
 import { TopBar } from '../src/components/landing/TopBar';
 import { ClickSpark } from '../src/components/common/ClickSpark';
@@ -134,39 +135,64 @@ export default function LandingScreen() {
 
   const primaryCta = () => router.navigate(accessToken ? '/(tabs)/today' : '/register');
 
+  // One knob for the whole pinned stage: the scenes are composed for a 1280px
+  // desktop and shrink together rather than reflowing.
+  const stageScale = width >= 1280 ? 1 : width >= 1024 ? 0.88 : isWide ? 0.78 : 0.7;
+
+  const hero = (
+    <View style={styles.hero}>
+      <ShinyText style={styles.eyebrow}>AN AI COMPANION FOR PSYCHOLOGY</ShinyText>
+      <AnimatedText
+        text="A place where you are"
+        style={[styles.heroLine, heroLineSize(stageScale)]}
+      />
+      <GradientText style={[styles.heroLine, heroLineSize(stageScale)]}>
+        actually listened to
+      </GradientText>
+      {/* Static, and specific: a rotating line meant the visitor never saw
+          the whole proposition at once — only one fragment of four. */}
+      <Text style={styles.heroSub}>
+        Tell Alex what is on your mind. It listens, asks guiding questions, and points you to a
+        book or an idea from psychology — no diagnoses, no instructions on what to do.
+      </Text>
+      <View style={styles.heroActions}>
+        <ClickSpark onPress={primaryCta}>
+          <SpecularButton style={styles.ctaPrimary} onPress={primaryCta}>
+            <Text style={styles.ctaPrimaryText}>
+              {accessToken ? 'Open the app' : 'Start free'}
+            </Text>
+          </SpecularButton>
+        </ClickSpark>
+        {!accessToken ? (
+          <Pressable style={styles.ctaGhost} onPress={() => router.navigate('/login')}>
+            <Text style={styles.ctaGhostText}>I already have an account</Text>
+          </Pressable>
+        ) : null}
+      </View>
+      <Text style={styles.heroDisclaimer}>
+        Alex is a companion, not a therapist, and does not replace working with a professional.
+      </Text>
+      {/* A pinned stage looks like a stuck page unless something says otherwise. */}
+      {isWide ? <Text style={styles.scrollHint}>Scroll —</Text> : null}
+    </View>
+  );
+
+  // Rides along in the stage's bottom-right corner. The pinned sequence is four
+  // viewports long, so without this the only way to sign up is to scroll back.
+  const stageAside = (
+    <Pressable onPress={primaryCta} style={styles.aside} accessibilityRole="button">
+      <Text style={styles.asideLabel}>Free to try</Text>
+      <Text style={styles.asideTitle}>{accessToken ? 'Open the app' : 'Start a conversation'}</Text>
+      <Text style={styles.asideMeta}>No card, no questionnaire →</Text>
+    </Pressable>
+  );
+
   return (
     <GlassBackground>
       <TopBar />
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
-        {/* ---- Hero ---- */}
-        <View style={styles.hero}>
-          <ShinyText style={styles.eyebrow}>AN AI COMPANION FOR PSYCHOLOGY</ShinyText>
-          <AnimatedText text="A place where you are" style={styles.heroLine} />
-          <GradientText style={styles.heroLine}>actually listened to</GradientText>
-          {/* Static, and specific: a rotating line meant the visitor never saw
-              the whole proposition at once — only one fragment of four. */}
-          <Text style={styles.heroSub}>
-            Tell Alex what is on your mind. It listens, asks guiding questions, and points you to a
-            book or an idea from psychology — no diagnoses, no instructions on what to do.
-          </Text>
-          <View style={styles.heroActions}>
-            <ClickSpark onPress={primaryCta}>
-              <SpecularButton style={styles.ctaPrimary} onPress={primaryCta}>
-                <Text style={styles.ctaPrimaryText}>
-                  {accessToken ? 'Open the app' : 'Start free'}
-                </Text>
-              </SpecularButton>
-            </ClickSpark>
-            {!accessToken ? (
-              <Pressable style={styles.ctaGhost} onPress={() => router.navigate('/login')}>
-                <Text style={styles.ctaGhostText}>I already have an account</Text>
-              </Pressable>
-            ) : null}
-          </View>
-          <Text style={styles.heroDisclaimer}>
-            Alex is a companion, not a therapist, and does not replace working with a professional.
-          </Text>
-        </View>
+        {/* ---- Pinned opening act: hero -> audience scenes -> boundaries ---- */}
+        <PinnedStage enabled={isWide} scale={stageScale} hero={hero} aside={stageAside} />
 
         {/* ---- Topics marquee ---- */}
         <View style={styles.marqueeSection}>
@@ -260,36 +286,9 @@ export default function LandingScreen() {
           </View>
         </Section>
 
-        {/* ---- Privacy & boundaries: the objection the page never answered ---- */}
-        <Section
-          id="privacy"
-          title="Privacy and boundaries"
-          subtitle="What Alex does, what it doesn't, and what happens to your words."
-        >
-          <View style={[styles.boundaryGrid, isWide && styles.boundaryGridWide]}>
-            {[
-              {
-                title: 'No diagnoses',
-                body: 'Alex gives no diagnoses and no instructions about your particular situation. It talks about general ideas from psychology.',
-              },
-              {
-                title: 'The conversation is yours',
-                body: 'Your thread is tied to your account and visible only to you. Delete all of it in one tap.',
-              },
-              {
-                title: 'In a crisis, to people',
-                body: 'If a message signals a threat to yourself, Alex stops the ordinary conversation and points you to a professional.',
-              },
-            ].map((b, i) => (
-              <ScrollReveal key={b.title} delay={i * 90} style={isWide ? styles.boundaryCellWide : styles.featureCell}>
-                <GlassCard style={styles.boundaryCard}>
-                  <Text style={styles.featureTitle}>{b.title}</Text>
-                  <Text style={styles.featureBody}>{b.body}</Text>
-                </GlassCard>
-              </ScrollReveal>
-            ))}
-          </View>
-        </Section>
+        {/* The privacy/boundaries grid that used to sit here is now the closing
+            layer of the pinned stage (STAGE_OUTRO) — same three points, stated
+            before the visitor has scrolled past the pitch rather than after. */}
 
         {/* ---- FAQ ---- */}
         <Section id="faq" title="Common questions" subtitle="Briefly, the things people ask before signing up.">
@@ -353,12 +352,37 @@ function Section({ id, title, subtitle, children }: { id: string; title: string;
 
 const contentWidth: ViewStyle = { width: '100%', maxWidth: 1100, alignSelf: 'center' };
 
+/**
+ * Poster-scale hero type. Kept as a function rather than a style entry because
+ * the size has to track `stageScale` — inside the pinned stage the hero has one
+ * viewport and no more, so it shrinks with the composition instead of wrapping.
+ */
+function heroLineSize(scale: number) {
+  const size = Math.round(62 * scale);
+  return { fontSize: size, lineHeight: Math.round(size * 1.02) };
+}
+
 const styles = StyleSheet.create({
   scroll: { paddingBottom: theme.spacing.xl * 2 },
 
-  hero: { ...contentWidth, paddingHorizontal: theme.spacing.lg, paddingTop: theme.spacing.xl * 2, paddingBottom: theme.spacing.xl, alignItems: 'center', gap: theme.spacing.md },
+  // No vertical padding: inside the pinned stage the hero is centred in the
+  // viewport, and on the static fallback StageStatic supplies the spacing.
+  hero: { ...contentWidth, paddingHorizontal: theme.spacing.lg, alignItems: 'center', gap: theme.spacing.sm },
   eyebrow: { fontSize: theme.fontSize.sm, fontWeight: '700', letterSpacing: 1.5 },
-  heroLine: { fontSize: 44, lineHeight: 52, fontWeight: '700', color: theme.colors.textPrimary, textAlign: 'center' },
+  heroLine: {
+    fontFamily: theme.fonts.display,
+    color: theme.colors.textPrimary,
+    textAlign: 'center',
+    letterSpacing: -0.8,
+  },
+  scrollHint: {
+    marginTop: theme.spacing.xl,
+    fontSize: theme.fontSize.xs,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
+    color: theme.colors.textFaint,
+    fontFamily: theme.fonts.bodyBold,
+  },
   heroSub: {
     fontSize: theme.fontSize.md,
     lineHeight: 27,
@@ -380,7 +404,29 @@ const styles = StyleSheet.create({
   ctaGhost: { paddingVertical: 14, paddingHorizontal: theme.spacing.lg },
   ctaGhostText: { color: theme.colors.textSecondary, fontSize: theme.fontSize.md, fontWeight: '600', textDecorationLine: 'underline' },
 
-  marqueeSection: { paddingVertical: theme.spacing.xl },
+  aside: {
+    width: 232,
+    padding: theme.spacing.md,
+    borderRadius: theme.radius.lg,
+    backgroundColor: 'rgba(10,23,16,0.9)',
+    borderWidth: 1,
+    borderColor: theme.glass.borderStrong,
+    gap: 4,
+    ...(theme.shadow.cardHover as object),
+  },
+  asideLabel: {
+    fontFamily: theme.fonts.bodyBold,
+    fontSize: 9.5,
+    letterSpacing: 1.2,
+    textTransform: 'uppercase',
+    color: theme.colors.accent,
+  },
+  asideTitle: { fontFamily: theme.fonts.display, fontSize: theme.fontSize.md, color: theme.colors.textPrimary },
+  asideMeta: { fontFamily: theme.fonts.body, fontSize: theme.fontSize.xs, color: theme.colors.textSecondary },
+
+  // Extra air above: this is the seam where the full-bleed pinned stage hands
+  // over to ordinary page sections, and it needs to read as a deliberate break.
+  marqueeSection: { paddingTop: theme.spacing.xl * 2, paddingBottom: theme.spacing.xl },
 
   section: { ...contentWidth, paddingHorizontal: theme.spacing.lg, paddingVertical: theme.spacing.xl },
   sectionTitle: { fontSize: theme.fontSize.xl, fontWeight: '700', color: theme.colors.textPrimary, textAlign: 'center' },
@@ -418,12 +464,6 @@ const styles = StyleSheet.create({
   },
   stepTitle: { fontFamily: theme.fonts.display, fontSize: theme.fontSize.md, color: theme.colors.textPrimary },
   stepBody: { fontSize: theme.fontSize.sm, lineHeight: 21, color: theme.colors.textSecondary },
-  boundaryGrid: { gap: theme.spacing.md },
-  // Three across on wide screens — reusing the 4-up feature cell (48%) here
-  // left a half-empty second row.
-  boundaryGridWide: { flexDirection: 'row', flexWrap: 'nowrap' },
-  boundaryCellWide: { flex: 1 },
-  boundaryCard: { gap: theme.spacing.sm, minHeight: 150, height: '100%' },
   faqWrap: { gap: theme.spacing.md, maxWidth: 760, width: '100%', alignSelf: 'center' },
   faqItem: {
     padding: theme.spacing.lg,

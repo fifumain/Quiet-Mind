@@ -1,4 +1,5 @@
 import { StyleSheet, View } from 'react-native';
+import { noPointer } from './noPointer';
 
 // Static fractal-noise grain via an inline SVG filter (data URI) — cheaper
 // than reactbits.dev's animated canvas noise and plenty for taking the flat
@@ -9,9 +10,9 @@ const NOISE_SVG =
 export function NoiseOverlay() {
   return (
     <View
-      pointerEvents="none"
       style={[
         StyleSheet.absoluteFill,
+        noPointer,
         {
           backgroundImage: `url("${NOISE_SVG}")`,
           opacity: 0.05,

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { Platform, Pressable, StyleSheet, View } from 'react-native';
+import { Platform, Pressable, StyleSheet, useWindowDimensions, View } from 'react-native';
 import { Text } from '../common/AppText';
 import { SpecularButton } from '../common/SpecularButton';
 import { glassBlur, theme } from '../../theme/theme';
@@ -20,19 +20,25 @@ function scrollToSection(id: string) {
 export function TopBar() {
   const router = useRouter();
   const accessToken = useAuthStore((s) => s.accessToken);
+  const { width } = useWindowDimensions();
+  // Below this the four section links crowded the row and pushed the log-in and
+  // sign-up buttons off the right edge entirely.
+  const showLinks = width >= 900;
 
   return (
     <View style={[styles.bar, glassBlur(20), stickyStyle]}>
       <View style={styles.inner}>
         <Text style={styles.brand}>Alex</Text>
 
-        <View style={styles.links}>
-          {NAV.map((item) => (
-            <Pressable key={item.target} onPress={() => scrollToSection(item.target)}>
-              <Text style={styles.link}>{item.label}</Text>
-            </Pressable>
-          ))}
-        </View>
+        {showLinks ? (
+          <View style={styles.links}>
+            {NAV.map((item) => (
+              <Pressable key={item.target} onPress={() => scrollToSection(item.target)}>
+                <Text style={styles.link}>{item.label}</Text>
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
 
         <View style={styles.actions}>
           {accessToken ? (

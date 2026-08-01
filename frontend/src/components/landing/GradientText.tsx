@@ -1,12 +1,12 @@
 import { useEffect } from 'react';
-import { Platform, type TextStyle } from 'react-native';
+import { Platform, type StyleProp, type TextStyle } from 'react-native';
 import { Text } from '../common/AppText';
 import { theme } from '../../theme/theme';
 import { injectKeyframes } from './injectKeyframes';
 
 interface GradientTextProps {
   children: string;
-  style?: TextStyle;
+  style?: StyleProp<TextStyle>;
   colors?: string[];
   speed?: number;
 }

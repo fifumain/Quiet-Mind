@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { StyleSheet, type StyleProp, type ViewStyle } from 'react-native';
 import Animated, { Easing, useAnimatedStyle, useSharedValue, withRepeat, withTiming } from 'react-native-reanimated';
 import { theme } from '../../theme/theme';
+import { noPointer } from './noPointer';
 
 interface GlowBorderProps {
   children: ReactNode;
@@ -30,10 +31,7 @@ export function GlowBorder({ children, active = true, style, radius = theme.radi
 
   return (
     <Animated.View style={style}>
-      <Animated.View
-        pointerEvents="none"
-        style={[styles.glow, { borderRadius: radius + 6 }, glowStyle]}
-      />
+      <Animated.View style={[styles.glow, { borderRadius: radius + 6 }, glowStyle, noPointer]} />
       <Animated.View style={[styles.content, { borderRadius: radius }]}>{children}</Animated.View>
     </Animated.View>
   );
