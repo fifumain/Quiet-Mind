@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Pressable, StyleSheet, View } from 'react-native';
 import { Text } from '../common/AppText';
 import { AnimatedEntrance } from '../common/AnimatedEntrance';
@@ -13,7 +14,8 @@ interface HistoryEntryProps {
   title: string;
   subtitle: string;
   body?: string;
-  onPress: () => void;
+  /** Omit for entries with nowhere to go — e.g. a mood check-in has no detail screen. */
+  onPress?: () => void;
 }
 
 /**
@@ -23,27 +25,39 @@ interface HistoryEntryProps {
  * stretch carries it all the way down to the next dot with no visual break.
  */
 export function HistoryEntry({ index, isLast, isCurrent, dateLabel, title, subtitle, body, onPress }: HistoryEntryProps) {
+  const content: ReactNode = (
+    <>
+      <View style={styles.cardHeader}>
+        <Text style={styles.date}>{dateLabel}</Text>
+        {isCurrent ? (
+          <View style={styles.currentPill}>
+            <Text style={styles.currentPillText}>CURRENT</Text>
+          </View>
+        ) : null}
+      </View>
+      <Text style={styles.title} numberOfLines={4}>
+        {title}
+      </Text>
+      <Text style={styles.subtitle}>{subtitle}</Text>
+      {body ? (
+        <Text style={styles.body} numberOfLines={2}>
+          {body}
+        </Text>
+      ) : null}
+    </>
+  );
+
   const card = (
     <GlareHover style={[styles.card, isCurrent && styles.cardCurrent, glassBlur(12)]}>
-      <Pressable onPress={onPress} style={styles.pressable}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.date}>{dateLabel}</Text>
-          {isCurrent ? (
-            <View style={styles.currentPill}>
-              <Text style={styles.currentPillText}>CURRENT</Text>
-            </View>
-          ) : null}
-        </View>
-        <Text style={styles.title} numberOfLines={4}>
-          {title}
-        </Text>
-        <Text style={styles.subtitle}>{subtitle}</Text>
-        {body ? (
-          <Text style={styles.body} numberOfLines={2}>
-            {body}
-          </Text>
-        ) : null}
-      </Pressable>
+      {onPress ? (
+        <Pressable onPress={onPress} style={styles.pressable}>
+          {content}
+        </Pressable>
+      ) : (
+        // No detail screen to tap through to — a Pressable here would be a
+        // touch target that visibly reacts and goes nowhere.
+        <View style={styles.pressable}>{content}</View>
+      )}
     </GlareHover>
   );
 

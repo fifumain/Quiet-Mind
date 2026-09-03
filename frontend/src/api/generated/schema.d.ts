@@ -472,6 +472,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/mood/history/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_mood_history_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/mood/today/": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["v1_mood_today_retrieve"];
+        put?: never;
+        post: operations["v1_mood_today_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/quote-of-the-day/": {
         parameters: {
             query?: never;
@@ -691,6 +723,23 @@ export interface components {
             week_start: string;
             readonly book: components["schemas"]["Book"];
         };
+        MoodCheckIn: {
+            /** Format: date */
+            readonly date: string;
+            mood: components["schemas"]["MoodEnum"];
+            note?: string;
+            /** Format: date-time */
+            readonly created_at: string;
+        };
+        /**
+         * @description * `great` - Great
+         *     * `good` - Good
+         *     * `okay` - Okay
+         *     * `low` - Low
+         *     * `struggling` - Struggling
+         * @enum {string}
+         */
+        MoodEnum: "great" | "good" | "okay" | "low" | "struggling";
         PaginatedAuthorList: {
             /** @example 123 */
             count: number;
@@ -825,6 +874,21 @@ export interface components {
              */
             previous?: string | null;
             results: components["schemas"]["FeaturedBook"][];
+        };
+        PaginatedMoodCheckInList: {
+            /** @example 123 */
+            count: number;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=4
+             */
+            next?: string | null;
+            /**
+             * Format: uri
+             * @example http://api.example.org/accounts/?page=2
+             */
+            previous?: string | null;
+            results: components["schemas"]["MoodCheckIn"][];
         };
         PaginatedQuoteList: {
             /** @example 123 */
@@ -1517,6 +1581,72 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FeaturedBook"];
+                };
+            };
+        };
+    };
+    v1_mood_history_list: {
+        parameters: {
+            query?: {
+                /** @description A page number within the paginated result set. */
+                page?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PaginatedMoodCheckInList"];
+                };
+            };
+        };
+    };
+    v1_mood_today_retrieve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoodCheckIn"];
+                };
+            };
+        };
+    };
+    v1_mood_today_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MoodCheckIn"];
+                "application/x-www-form-urlencoded": components["schemas"]["MoodCheckIn"];
+                "multipart/form-data": components["schemas"]["MoodCheckIn"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MoodCheckIn"];
                 };
             };
         };

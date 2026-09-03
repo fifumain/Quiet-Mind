@@ -7,6 +7,7 @@ import { LoadingSpinner } from '../../../src/components/common/LoadingSpinner';
 import { ScreenContainer } from '../../../src/components/common/ScreenContainer';
 import { TiltedCard } from '../../../src/components/common/TiltedCard';
 import { FeaturedBookCard } from '../../../src/components/today/FeaturedBookCard';
+import { MoodPrompt } from '../../../src/components/today/MoodPrompt';
 import { QuoteOfTheDayCard } from '../../../src/components/today/QuoteOfTheDayCard';
 import { useLogout } from '../../../src/hooks/useAuth';
 import { useFeaturedBook } from '../../../src/hooks/useBooks';
@@ -72,6 +73,8 @@ export default function TodayScreen() {
           </View>
         </AnimatedEntrance>
       ) : null}
+
+      <MoodPrompt />
 
       <View style={[styles.grid, twoColumn && styles.gridWide]}>
         <View style={styles.col}>{quoteBlock}</View>

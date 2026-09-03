@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     "apps.books",
     "apps.courses",
     "apps.chat",
+    "apps.checkins",
 ]
 
 MIDDLEWARE = [

@@ -9,10 +9,20 @@ import { ScreenContainer } from '../../../../src/components/common/ScreenContain
 import { GradientText } from '../../../../src/components/landing/GradientText';
 import { HistoryEntry } from '../../../../src/components/library/HistoryEntry';
 import { useFeaturedBookHistory } from '../../../../src/hooks/useBooks';
+import { useMoodHistory } from '../../../../src/hooks/useMood';
 import { useQuoteOfTheDayHistory } from '../../../../src/hooks/useQuotes';
 import { glassBlur, theme } from '../../../../src/theme/theme';
+import type { MoodValue } from '../../../../src/api/endpoints/mood';
 
-type Segment = 'quotes' | 'books';
+type Segment = 'quotes' | 'books' | 'mood';
+
+const MOOD_LABELS: Record<MoodValue, string> = {
+  great: 'Great',
+  good: 'Good',
+  okay: 'Okay',
+  low: 'Low',
+  struggling: 'Struggling',
+};
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -30,10 +40,12 @@ export default function HistoryScreen() {
 
   const quoteHistory = useQuoteOfTheDayHistory();
   const bookHistory = useFeaturedBookHistory();
+  const moodHistory = useMoodHistory();
 
-  const activeQuery = segment === 'quotes' ? quoteHistory : bookHistory;
+  const activeQuery = segment === 'quotes' ? quoteHistory : segment === 'books' ? bookHistory : moodHistory;
   const quoteItems = quoteHistory.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
   const bookItems = bookHistory.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
+  const moodItems = moodHistory.data?.pages.flatMap((page) => page?.results ?? []) ?? [];
   const total = activeQuery.data?.pages[0]?.count ?? 0;
 
   const loadMore = () => {
@@ -52,11 +64,13 @@ export default function HistoryScreen() {
       <View style={[styles.segment, glassBlur()]}>
         <SegmentButton label="Quotes of the day" active={segment === 'quotes'} onPress={() => setSegment('quotes')} />
         <SegmentButton label="Books of the week" active={segment === 'books'} onPress={() => setSegment('books')} />
+        <SegmentButton label="Mood" active={segment === 'mood'} onPress={() => setSegment('mood')} />
       </View>
 
       {!activeQuery.isLoading ? (
         <Text style={styles.total}>
-          <CountUp target={total} /> {segment === 'quotes' ? 'days' : 'weeks'} of history
+          <CountUp target={total} /> {segment === 'quotes' ? 'days' : segment === 'books' ? 'weeks' : 'check-ins'} of
+          history
         </Text>
       ) : null}
     </View>
@@ -71,6 +85,31 @@ export default function HistoryScreen() {
           {header}
           <LoadingSpinner />
         </>
+      ) : segment === 'mood' ? (
+        <FlatList
+          key="mood"
+          data={moodItems}
+          keyExtractor={(item) => item.date}
+          ListHeaderComponent={header}
+          ListFooterComponent={footer}
+          ListEmptyComponent={<EmptyState message="No mood check-ins yet." />}
+          contentContainerStyle={styles.list}
+          showsVerticalScrollIndicator={false}
+          onEndReachedThreshold={0.4}
+          onEndReached={loadMore}
+          renderItem={({ item, index }) => (
+            <HistoryEntry
+              index={index}
+              isLast={index === moodItems.length - 1 && !moodHistory.hasNextPage}
+              isCurrent={false}
+              dateLabel={formatDate(item.date)}
+              title={MOOD_LABELS[item.mood]}
+              subtitle={item.note || 'No note'}
+              // No detail screen for a mood entry — HistoryEntry renders it as
+              // a plain, non-interactive row when onPress is omitted.
+            />
+          )}
+        />
       ) : segment === 'quotes' ? (
         <FlatList
           key="quotes"
