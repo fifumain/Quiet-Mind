@@ -38,11 +38,16 @@ class ChatMessageListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
+        session = self.get_session()
+
+        # Cache the message before it's persisted: get_cached_context() falls
+        # back to reading the DB on a cache miss, and if the message were
+        # saved first, that fallback would already include it — causing
+        # append_and_cache() to append a second, duplicate copy on top.
+        conversation.append_and_cache(session.id, "user", serializer.validated_data["content"])
+
         self.perform_create(serializer)
         user_message = serializer.instance
-        session = user_message.session
-
-        conversation.append_and_cache(session.id, "user", user_message.content)
         session.refresh_from_db(fields=["summary"])
 
         try:
