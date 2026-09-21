@@ -129,6 +129,7 @@ REST_FRAMEWORK = {
         "anon": "120/minute",
         "user": "300/minute",
         "chat_message": "15/minute",
+        "register": "5/hour",
     },
 }
 

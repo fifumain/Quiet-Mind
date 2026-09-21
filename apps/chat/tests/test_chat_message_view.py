@@ -74,6 +74,16 @@ def test_groq_unavailable_returns_503_without_creating_assistant_message(auth_cl
     assert not ChatMessage.objects.filter(role="assistant").exists()
 
 
+def test_message_over_max_length_is_rejected(auth_client, mocker):
+    mock_completion = mocker.patch.object(groq_client, "create_completion")
+
+    response = auth_client.post(reverse(MESSAGES_URL), {"content": "x" * 4001})
+
+    assert response.status_code == 400
+    assert "content" in response.data
+    mock_completion.assert_not_called()
+
+
 def test_chat_message_post_is_throttled_but_history_get_is_not(auth_client, mocker, settings):
     mocker.patch.object(groq_client, "create_completion", return_value=_fake_completion("ok"))
     rate = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["chat_message"]

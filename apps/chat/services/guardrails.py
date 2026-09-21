@@ -11,6 +11,12 @@ CRISIS_PATTERNS_EN = [
     r"\bcutting myself\b",
     r"\bno reason to live\b",
     r"\bbetter off dead\b",
+    # Added for indirect phrasing that doesn't use the words above directly.
+    r"\bdon'?t want to (be here|exist) anymore\b",
+    r"\bno point (in )?(going on|living)\b",
+    r"\bcan'?t (do this|go on) anymore\b",
+    r"\bwish I (was|were) dead\b",
+    r"\bplanning to (end|take) my life\b",
 ]
 
 CRISIS_PATTERNS_RU = [
@@ -23,6 +29,11 @@ CRISIS_PATTERNS_RU = [
     r"порезать себя",
     r"нет смысла жить",
     r"лучше бы я умер",
+    # Added for indirect phrasing that doesn't use the words above directly.
+    r"не хочу больше жить",
+    r"не вижу смысла жить дальше",
+    r"больше не могу так",
+    r"хочу исчезнуть",
 ]
 
 _EN_RE = re.compile("|".join(CRISIS_PATTERNS_EN), re.IGNORECASE)

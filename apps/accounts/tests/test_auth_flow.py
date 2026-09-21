@@ -29,6 +29,24 @@ def test_register_rejects_duplicate_email_case_insensitive(api_client):
     assert "email" in response.data
 
 
+def test_register_is_throttled_per_ip(api_client, settings):
+    rate = settings.REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"]["register"]
+    limit = int(rate.split("/")[0])
+
+    for i in range(limit):
+        response = api_client.post(
+            reverse("register"),
+            {"username": f"user{i}", "email": f"user{i}@example.com", "password": STRONG_PASSWORD},
+        )
+        assert response.status_code == 201
+
+    over_limit = api_client.post(
+        reverse("register"),
+        {"username": "one_too_many", "email": "one_too_many@example.com", "password": STRONG_PASSWORD},
+    )
+    assert over_limit.status_code == 429
+
+
 def test_token_obtain_with_valid_credentials(api_client):
     User.objects.create_user(username="bob", password=STRONG_PASSWORD)
 

@@ -34,6 +34,38 @@ def test_check_crisis_detects_russian_phrases(text):
 @pytest.mark.parametrize(
     "text",
     [
+        "I don't want to be here anymore",
+        "I don't want to exist anymore",
+        "there's no point in going on",
+        "there's no point living",
+        "I can't do this anymore",
+        "I can't go on anymore",
+        "I wish I was dead",
+        "I wish I were dead",
+        "I've been planning to end my life",
+        "I've been planning to take my life",
+    ],
+)
+def test_check_crisis_detects_indirect_english_phrases(text):
+    assert check_crisis(text) == "en"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "я не хочу больше жить",
+        "не вижу смысла жить дальше",
+        "больше не могу так",
+        "хочу исчезнуть",
+    ],
+)
+def test_check_crisis_detects_indirect_russian_phrases(text):
+    assert check_crisis(text) == "ru"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
         "I had a rough day at work today",
         "мне сегодня было грустно, но всё в порядке",
         "",
