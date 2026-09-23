@@ -1,3 +1,8 @@
-from django.shortcuts import render
+from django.http import JsonResponse
 
-# Create your views here.
+
+def healthz(request):
+    """Liveness check for EC2/ALB — deliberately doesn't touch the DB or cache,
+    so a transient Postgres/Redis hiccup doesn't flap this process's own health
+    status along with it."""
+    return JsonResponse({"status": "ok"})

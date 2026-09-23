@@ -1,0 +1,26 @@
+services:
+  web:
+    build:
+      context: .
+      args:
+        REQUIREMENTS_FILE: requirements/prod.txt
+    # No dev-only override here — this uses the image's own CMD (gunicorn).
+    env_file:
+      - .env
+    ports:
+      - "8000:8000"
+
+  celery:
+    build:
+      context: .
+      args:
+        REQUIREMENTS_FILE: requirements/prod.txt
+    command: celery -A config worker -B --loglevel=info
+    env_file:
+      - .env
+
+# No postgres/redis here on purpose: on AWS those roles are played by RDS and
+# ElastiCache, not by containers this repo builds. POSTGRES_HOST/REDIS_URL are
+# expected to point at those managed endpoints via the .env file above (see
+# .env.example) — same POSTGRES_HOST/REDIS_URL vars the app already reads in
+# config/settings/base.py, no code changes needed for that part.

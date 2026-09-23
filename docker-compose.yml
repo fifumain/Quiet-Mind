@@ -30,6 +30,10 @@ services:
       context: .
       args:
         REQUIREMENTS_FILE: requirements/dev.txt
+    # The image's own CMD is now gunicorn (production-correct default) — local
+    # dev overrides it back to the hot-reloading dev server, same as `celery`
+    # below already overrides it to run the worker instead.
+    command: python manage.py runserver 0.0.0.0:8000
     env_file:
       - .env
     environment:
