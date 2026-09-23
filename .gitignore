@@ -33,6 +33,13 @@ htmlcov/
 # Docker
 docker-compose.override.yml
 
+# Terraform
+infra/.terraform/
+infra/*.tfstate
+infra/*.tfstate.*
+infra/*.tfvars
+!infra/*.tfvars.example
+
 # Logs
 *.log
 
