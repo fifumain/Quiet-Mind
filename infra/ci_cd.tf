@@ -33,10 +33,17 @@ data "aws_iam_policy_document" "github_actions_assume" {
     # Scoped to pushes on this exact branch of this exact repo — not to any
     # workflow run in any repo that happens to use this OIDC provider, and not
     # to pull_request-triggered runs (those carry a different "sub" claim).
+    #
+    # This repo (or its owner account) was renamed at some point, so GitHub's
+    # actual "sub" claim embeds immutable numeric IDs alongside the names —
+    # "repo:fifumain@64656213/Quiet-Mind@1304458888:ref:refs/heads/main", not
+    # the plain "repo:fifumain/Quiet-Mind:..." you'd expect. Matching on the
+    # ID form is if anything more robust: it keeps working even through a
+    # future rename, since the numeric IDs never change.
     condition {
       test     = "StringLike"
       variable = "token.actions.githubusercontent.com:sub"
-      values   = ["repo:${var.github_repo}:ref:refs/heads/${var.github_branch}"]
+      values   = ["repo:fifumain@64656213/Quiet-Mind@1304458888:ref:refs/heads/${var.github_branch}"]
     }
   }
 }
