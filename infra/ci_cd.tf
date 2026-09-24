@@ -12,7 +12,12 @@ resource "aws_iam_openid_connect_provider" "github" {
 
 data "aws_iam_policy_document" "github_actions_assume" {
   statement {
-    actions = ["sts:AssumeRoleWithWebIdentity"]
+    # aws-actions/configure-aws-credentials attaches session tags (repo, ref,
+    # actor, etc.) to the AssumeRoleWithWebIdentity call by default — without
+    # sts:TagSession also allowed here, AWS rejects the whole call with a
+    # generic "Not authorized to perform sts:AssumeRoleWithWebIdentity", which
+    # doesn't mention tagging at all.
+    actions = ["sts:AssumeRoleWithWebIdentity", "sts:TagSession"]
 
     principals {
       type        = "Federated"
