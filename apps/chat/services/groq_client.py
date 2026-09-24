@@ -37,13 +37,13 @@ def get_client():
     return _client
 
 
-def create_completion(messages, tools=None, tool_choice="auto", max_tokens=None):
+def create_completion(messages, tools=None, tool_choice="auto", max_tokens=None, model=None, response_format=None):
     client = get_client()
     last_exc = None
     for attempt in range(MAX_ATTEMPTS):
         try:
             kwargs = {
-                "model": settings.GROQ_MODEL,
+                "model": model or settings.GROQ_MODEL,
                 "messages": messages,
                 "temperature": settings.GROQ_TEMPERATURE,
                 "max_tokens": max_tokens or settings.GROQ_MAX_TOKENS,
@@ -51,6 +51,8 @@ def create_completion(messages, tools=None, tool_choice="auto", max_tokens=None)
             if tools is not None:
                 kwargs["tools"] = tools
                 kwargs["tool_choice"] = tool_choice
+            if response_format is not None:
+                kwargs["response_format"] = response_format
             return client.chat.completions.create(**kwargs)
         except BadRequestError as exc:
             if "tool_use_failed" in str(exc):

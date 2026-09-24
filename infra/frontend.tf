@@ -53,6 +53,22 @@ resource "aws_cloudfront_distribution" "frontend" {
     }
   }
 
+  # expo-router exports a single index.html and routes client-side — S3
+  # (via OAC, not "website hosting") has no per-path index document, so a
+  # direct load of e.g. /chat 403s. Fall back to index.html and let the
+  # client-side router take over.
+  custom_error_response {
+    error_code         = 403
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+
+  custom_error_response {
+    error_code         = 404
+    response_code      = 200
+    response_page_path = "/index.html"
+  }
+
   # No custom domain yet, so no ACM cert either — the default *.cloudfront.net
   # certificate already gives free HTTPS.
   viewer_certificate {

@@ -159,9 +159,13 @@ SIMPLE_JWT = {
 }
 
 GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
-GROQ_MODEL = os.environ.get("GROQ_MODEL", "llama-3.3-70b-versatile")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 GROQ_TEMPERATURE = float(os.environ.get("GROQ_TEMPERATURE", "0.6"))
 GROQ_MAX_TOKENS = int(os.environ.get("GROQ_MAX_TOKENS", "300"))
+# Smaller/cheaper model used only for the pre-flight on-topic/crisis classifier
+# (apps/chat/services/moderation.py) — not for actual conversation replies.
+GROQ_MODERATION_MODEL = os.environ.get("GROQ_MODERATION_MODEL", "openai/gpt-oss-20b")
+GROQ_MODERATION_MAX_TOKENS = int(os.environ.get("GROQ_MODERATION_MAX_TOKENS", "40"))
 CHAT_SUMMARY_MAX_TOKENS = int(os.environ.get("CHAT_SUMMARY_MAX_TOKENS", "200"))
 
 CHAT_CONTEXT_WINDOW_SIZE = 12

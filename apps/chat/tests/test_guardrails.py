@@ -1,6 +1,10 @@
 import pytest
 
-from apps.chat.services.guardrails import check_crisis
+from apps.chat.services.guardrails import (
+    CRISIS_RESPONSES,
+    OFF_TOPIC_RESPONSES,
+    check_crisis,
+)
 
 
 @pytest.mark.parametrize(
@@ -16,6 +20,33 @@ from apps.chat.services.guardrails import check_crisis
 )
 def test_check_crisis_detects_english_phrases(text):
     assert check_crisis(text) == "en"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "я хочу покінчити з собою",
+        "у мене думки про самогубство",
+        "не хочу жити",
+        "іноді думаю про суїцид",
+        "хочу померти",
+    ],
+)
+def test_check_crisis_detects_ukrainian_phrases(text):
+    assert check_crisis(text) == "uk"
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "я не хочу більше жити",
+        "не бачу сенсу жити далі",
+        "більше не можу так",
+        "хочу зникнути",
+    ],
+)
+def test_check_crisis_detects_indirect_ukrainian_phrases(text):
+    assert check_crisis(text) == "uk"
 
 
 @pytest.mark.parametrize(
@@ -91,3 +122,13 @@ def test_check_crisis_prefers_russian_when_both_could_match():
     # Russian is checked first in check_crisis(); a message mixing both
     # languages should resolve to "ru" rather than "en".
     assert check_crisis("I want to kill myself, не хочу жить") == "ru"
+
+
+def test_crisis_responses_cover_all_regex_languages():
+    assert set(CRISIS_RESPONSES) == {"en", "ru", "uk"}
+    assert all(CRISIS_RESPONSES.values())
+
+
+def test_off_topic_responses_cover_all_regex_languages():
+    assert set(OFF_TOPIC_RESPONSES) == {"en", "ru", "uk"}
+    assert all(OFF_TOPIC_RESPONSES.values())

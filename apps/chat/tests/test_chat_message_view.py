@@ -5,8 +5,8 @@ from django.core.cache import cache
 from django.urls import reverse
 
 from apps.chat.models import ChatMessage
-from apps.chat.services import conversation, groq_client
-from apps.chat.services.guardrails import CRISIS_RESPONSE_EN
+from apps.chat.services import conversation, groq_client, moderation
+from apps.chat.services.guardrails import CRISIS_RESPONSE_EN, OFF_TOPIC_RESPONSE_EN
 
 pytestmark = pytest.mark.django_db
 
@@ -36,6 +36,36 @@ def test_crisis_message_short_circuits_groq(auth_client, mocker):
     assert response.data["assistant_message"]["content"] == CRISIS_RESPONSE_EN
     mock_completion.assert_not_called()
     assert ChatMessage.objects.filter(role="assistant", content=CRISIS_RESPONSE_EN).exists()
+
+
+def test_off_topic_message_short_circuits_groq(auth_client, mocker):
+    mocker.patch.object(
+        moderation,
+        "classify_message",
+        return_value=moderation.ModerationResult(on_topic=False, crisis=False, lang="en"),
+    )
+    mock_completion = mocker.patch.object(groq_client, "create_completion")
+
+    response = auth_client.post(reverse(MESSAGES_URL), {"content": "write me a recipe for cheesecake"})
+
+    assert response.status_code == 201
+    assert response.data["assistant_message"]["content"] == OFF_TOPIC_RESPONSE_EN
+    mock_completion.assert_not_called()
+
+
+def test_moderation_crisis_backstop_for_other_languages(auth_client, mocker):
+    mocker.patch.object(
+        moderation,
+        "classify_message",
+        return_value=moderation.ModerationResult(on_topic=True, crisis=True, lang="other"),
+    )
+    mock_completion = mocker.patch.object(groq_client, "create_completion")
+
+    response = auth_client.post(reverse(MESSAGES_URL), {"content": "je veux mourir"})
+
+    assert response.status_code == 201
+    assert response.data["assistant_message"]["content"] == CRISIS_RESPONSE_EN
+    mock_completion.assert_not_called()
 
 
 def test_normal_message_persists_mocked_reply_and_updates_context_cache(auth_client, mocker):

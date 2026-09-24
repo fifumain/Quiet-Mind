@@ -52,3 +52,8 @@ output "cloudfront_distribution_id" {
   description = "CloudFront distribution ID, needed for cache invalidations"
   value       = aws_cloudfront_distribution.frontend.id
 }
+
+output "api_cloudfront_domain" {
+  description = "CloudFront domain proxying HTTPS to the EC2 app over HTTP"
+  value       = aws_cloudfront_distribution.api.domain_name
+}

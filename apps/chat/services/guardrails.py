@@ -36,8 +36,27 @@ CRISIS_PATTERNS_RU = [
     r"хочу исчезнуть",
 ]
 
+CRISIS_PATTERNS_UK = [
+    r"покінчити з собою",
+    r"самогубств",
+    r"суїцид",
+    r"не хочу жити",
+    r"хочу померти",
+    r"хочу вмерти",
+    r"завдати собі шкоди",
+    r"порізати себе",
+    r"немає сенсу жити",
+    r"краще б я помер",
+    # Added for indirect phrasing that doesn't use the words above directly.
+    r"не хочу більше жити",
+    r"не бачу сенсу жити далі",
+    r"більше не можу так",
+    r"хочу зникнути",
+]
+
 _EN_RE = re.compile("|".join(CRISIS_PATTERNS_EN), re.IGNORECASE)
 _RU_RE = re.compile("|".join(CRISIS_PATTERNS_RU), re.IGNORECASE)
+_UK_RE = re.compile("|".join(CRISIS_PATTERNS_UK), re.IGNORECASE)
 
 
 def check_crisis(text: str) -> Optional[str]:
@@ -45,6 +64,8 @@ def check_crisis(text: str) -> Optional[str]:
         return None
     if _RU_RE.search(text):
         return "ru"
+    if _UK_RE.search(text):
+        return "uk"
     if _EN_RE.search(text):
         return "en"
     return None
@@ -66,3 +87,39 @@ CRISIS_RESPONSE_RU = (
     "тот, кому ты доверяешь — дай ему знать, что происходит. Тебе не нужно проходить через "
     "это в одиночку."
 )
+
+CRISIS_RESPONSE_UK = (
+    "Мені важливо, що ти розповів(-ла) мені про це, і я хочу, щоб ти був(-ла) у безпеці. "
+    "Я не можу сам надати кризову допомогу, але, будь ласка, звернись прямо зараз до тих, хто "
+    "може: подзвони на номер екстреної допомоги у своїй країні, знайди лінію кризової "
+    "психологічної підтримки у своєму регіоні, або звернись до фахівця. Якщо поруч є хтось, "
+    "кому ти довіряєш — розкажи їм, що відбувається. Тобі не потрібно проходити через це "
+    "наодинці."
+)
+
+CRISIS_RESPONSES = {
+    "en": CRISIS_RESPONSE_EN,
+    "ru": CRISIS_RESPONSE_RU,
+    "uk": CRISIS_RESPONSE_UK,
+}
+
+OFF_TOPIC_RESPONSE_EN = (
+    "That's not something I can help with here — I'm just here to listen and talk through "
+    "what's going on for you emotionally. What's actually on your mind today?"
+)
+
+OFF_TOPIC_RESPONSE_RU = (
+    "Это не то, с чем я могу помочь здесь — я просто рядом, чтобы выслушать и поговорить о "
+    "том, что происходит у тебя внутри. Что на самом деле сейчас у тебя на душе?"
+)
+
+OFF_TOPIC_RESPONSE_UK = (
+    "Це не те, з чим я можу тут допомогти — я просто поруч, щоб вислухати і поговорити про "
+    "те, що відбувається в тебе всередині. Що насправді зараз у тебе на душі?"
+)
+
+OFF_TOPIC_RESPONSES = {
+    "en": OFF_TOPIC_RESPONSE_EN,
+    "ru": OFF_TOPIC_RESPONSE_RU,
+    "uk": OFF_TOPIC_RESPONSE_UK,
+}
