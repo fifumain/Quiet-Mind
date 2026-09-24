@@ -56,3 +56,15 @@ variable "redis_node_type" {
   type        = string
   default     = "cache.t3.micro"
 }
+
+variable "github_repo" {
+  description = "GitHub repo (owner/name) allowed to assume the deploy role via OIDC"
+  type        = string
+  default     = "fifumain/Quiet-Mind"
+}
+
+variable "github_branch" {
+  description = "Branch allowed to assume the deploy role via OIDC"
+  type        = string
+  default     = "main"
+}

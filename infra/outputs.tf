@@ -57,3 +57,8 @@ output "api_cloudfront_domain" {
   description = "CloudFront domain proxying HTTPS to the EC2 app over HTTP"
   value       = aws_cloudfront_distribution.api.domain_name
 }
+
+output "github_actions_role_arn" {
+  description = "IAM role ARN GitHub Actions assumes via OIDC to deploy — paste into the AWS_DEPLOY_ROLE_ARN GitHub secret"
+  value       = aws_iam_role.github_actions_deploy.arn
+}
